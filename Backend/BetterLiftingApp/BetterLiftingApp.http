@@ -1,6 +1,6 @@
-@BetterLiftingApp_HostAddress = http://localhost:5240
+@root = http://localhost:5240
 
-GET {{BetterLiftingApp_HostAddress}}/weatherforecast/
+GET {{root}}/api/exercises
 Accept: application/json
 
 ###
