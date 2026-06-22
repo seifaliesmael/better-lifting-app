@@ -1,6 +1,6 @@
 # better-lifting-app
 A hypertrophy and periodisation focused lifting app.
 # Stack
-Back-end: .NET Core \
-Front-end: React.js
+Back-end: ASP.NET Core -> C# \
+Front-end: React -> TypeScript 
 
