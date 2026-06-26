@@ -7,24 +7,24 @@ namespace BetterLiftingApp.Data
     {
         public LiftingContext(DbContextOptions<LiftingContext> options) : base(options) {}
         public DbSet<Exercise> Exercises {get; set;} 
+        public DbSet<MuscleGroup> MuscleGroups {get; set;}
+        public DbSet<Workout> Workouts {get; set;}
+        public DbSet<WorkoutExercise> WorkoutExercises {get; set;}
+        public DbSet<WorkoutSet> WorkoutSets {get; set;}
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder);
+            // Seed Muscle Groups
+            modelBuilder.Entity<MuscleGroup>().HasData(SeedData.MuscleGroups);
 
-            // Seed data
-            modelBuilder.Entity<Exercise>().HasData(
-                new Exercise
-                {
-                    id = 1,
-                    exerciseName = "Seed Exercise One"
-                },
-                new Exercise
-                {
-                    id = 2,
-                    exerciseName = "Seed Exercise Two"
-                }
-            );
+            // Exercises is one-to-many
+            modelBuilder.Entity<Exercise>()
+            .HasMany(e => e.MuscleGroups)
+            .WithMany(); // unidirectional 
+
+            modelBuilder.Entity<WorkoutSet>().Property(e => e.Weight).HasPrecision(5,2);    
+
+            base.OnModelCreating(modelBuilder);
         }
 
     }

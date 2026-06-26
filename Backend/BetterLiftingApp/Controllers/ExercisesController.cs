@@ -15,30 +15,11 @@ namespace BetterLiftingApp.Controllers
             context = _context;
         }
 
-        // static private List<Exercise> exercises = new List<Exercise>
-        // {
-        //     new Exercise
-        //     {
-        //         Id = 1,
-        //         ExerciseName = "Exercise One"
-        //     },
-        //     new Exercise
-        //     {
-        //         Id = 2,
-        //         ExerciseName = "Exercise Two"
-        //     },  
-        //     new Exercise
-        //     {
-        //         Id = 3,
-        //         ExerciseName = "Exercise Three"
-        //     },  
-        // };
-
         [HttpGet]
         public async Task<ActionResult<List<Exercise>>> GetAllExercises()
         {
             Console.WriteLine("Received a get all request at Exercises");
-            List<Exercise> exercises = await context.Exercises.ToListAsync();
+            List<Exercise> exercises = await context.Exercises.Include(e => e.MuscleGroups).ToListAsync();
             return Ok(exercises);
         }
 
@@ -53,16 +34,31 @@ namespace BetterLiftingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Exercise>> AddExercise(Exercise newEx)
+        public async Task<ActionResult<Exercise>> AddExercise(ExerciseCreateData newEx)
         {
             Console.WriteLine($"Received a post request for new exercise");
 
             if (newEx == null) return BadRequest();
 
-            context.Exercises.Add(newEx);
+            List<MuscleGroup> muscleGroups = await context.MuscleGroups.Where(e => newEx.MuscleGroupIDs.Contains(e.Id)).ToListAsync();
+            
+            Exercise ex = new Exercise
+            {
+                ExerciseName = newEx.ExerciseName,
+                MuscleGroups = muscleGroups,
+                EquipmentType = newEx.EquipmentType
+            };
+            context.Exercises.Add(ex);
             await context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(AddExercise), new {id = newEx.id}, newEx);
+            return CreatedAtAction(nameof(GetExercise), new {id = ex.Id}, ex);
         }
+    }
+
+    public class ExerciseCreateData
+    {
+        public string ExerciseName {get; set;} = null!;
+        public List<int> MuscleGroupIDs {get; set;} = new();
+        public Equipment EquipmentType {get; set;}
     }
 }

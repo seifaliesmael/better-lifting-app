@@ -4,6 +4,7 @@ using BetterLiftingApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BetterLiftingApp.Migrations
 {
     [DbContext(typeof(LiftingContext))]
-    partial class LiftingContextModelSnapshot : ModelSnapshot
+    [Migration("20260626220705_weight precision")]
+    partial class weightprecision
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -208,13 +211,13 @@ namespace BetterLiftingApp.Migrations
 
             modelBuilder.Entity("ExerciseMuscleGroup", b =>
                 {
-                    b.Property<int>("ExerciseId")
+                    b.Property<int>("ExercisesId")
                         .HasColumnType("int");
 
                     b.Property<int>("MuscleGroupsId")
                         .HasColumnType("int");
 
-                    b.HasKey("ExerciseId", "MuscleGroupsId");
+                    b.HasKey("ExercisesId", "MuscleGroupsId");
 
                     b.HasIndex("MuscleGroupsId");
 
@@ -255,7 +258,7 @@ namespace BetterLiftingApp.Migrations
                 {
                     b.HasOne("BetterLiftingApp.Models.Exercise", null)
                         .WithMany()
-                        .HasForeignKey("ExerciseId")
+                        .HasForeignKey("ExercisesId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

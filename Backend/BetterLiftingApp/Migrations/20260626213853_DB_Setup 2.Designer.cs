@@ -4,6 +4,7 @@ using BetterLiftingApp.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BetterLiftingApp.Migrations
 {
     [DbContext(typeof(LiftingContext))]
-    partial class LiftingContextModelSnapshot : ModelSnapshot
+    [Migration("20260626213853_DB_Setup 2")]
+    partial class DB_Setup2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -50,11 +53,16 @@ namespace BetterLiftingApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("ExerciseId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ExerciseId");
 
                     b.ToTable("MuscleGroups");
 
@@ -193,8 +201,7 @@ namespace BetterLiftingApp.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Weight")
-                        .HasPrecision(5, 2)
-                        .HasColumnType("decimal(5,2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("WorkoutExerciseId")
                         .HasColumnType("int");
@@ -206,19 +213,11 @@ namespace BetterLiftingApp.Migrations
                     b.ToTable("WorkoutSets");
                 });
 
-            modelBuilder.Entity("ExerciseMuscleGroup", b =>
+            modelBuilder.Entity("BetterLiftingApp.Models.MuscleGroup", b =>
                 {
-                    b.Property<int>("ExerciseId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MuscleGroupsId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ExerciseId", "MuscleGroupsId");
-
-                    b.HasIndex("MuscleGroupsId");
-
-                    b.ToTable("ExerciseMuscleGroup");
+                    b.HasOne("BetterLiftingApp.Models.Exercise", null)
+                        .WithMany("MuscleGroups")
+                        .HasForeignKey("ExerciseId");
                 });
 
             modelBuilder.Entity("BetterLiftingApp.Models.WorkoutExercise", b =>
@@ -251,19 +250,9 @@ namespace BetterLiftingApp.Migrations
                     b.Navigation("WorkoutExercise");
                 });
 
-            modelBuilder.Entity("ExerciseMuscleGroup", b =>
+            modelBuilder.Entity("BetterLiftingApp.Models.Exercise", b =>
                 {
-                    b.HasOne("BetterLiftingApp.Models.Exercise", null)
-                        .WithMany()
-                        .HasForeignKey("ExerciseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("BetterLiftingApp.Models.MuscleGroup", null)
-                        .WithMany()
-                        .HasForeignKey("MuscleGroupsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Navigation("MuscleGroups");
                 });
 
             modelBuilder.Entity("BetterLiftingApp.Models.WorkoutExercise", b =>

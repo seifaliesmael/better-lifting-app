@@ -4,3 +4,17 @@ GET {{root}}/api/exercises
 Accept: application/json
 
 ###
+
+GET {{root}}/api/musclegroups
+Accept: application/json
+
+###
+
+POST {{root}}/api/exercises
+Content-Type:application/json
+
+{
+    "exerciseName" : "Dumbbell Row",
+    "muscleGroupIDs": [8, 3],
+    "equipmentType" : 2
+}
