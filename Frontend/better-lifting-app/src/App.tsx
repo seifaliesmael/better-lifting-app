@@ -1,47 +1,37 @@
 import { useState } from 'react'
-import Container from 'react-bootstrap/Container';
-import Row from 'react-bootstrap/Row';
-import Col from 'react-bootstrap/Col';
-import Card from 'react-bootstrap/Card';
-import { useQuery } from '@tanstack/react-query';
-import './App.css'
+import { Button, Col, Container, Row } from 'react-bootstrap';
+import RenderAllExercises from './Components/RenderAllExercises';
+import RenderAllMuscleGroups from './Components/RenderAllMuscleGroups';
 
-interface Exercise {
-  id: number,
-  exerciseName: string
-}
-
-const fetchData = async (): Promise<Exercise[]> => {
-  const response = await fetch('http://localhost:5240/api/exercises');
-  if (!response.ok) throw new Error('Network error');
-  return response.json();
-};
 
 function App() {
-  const { data, isLoading, error} = useQuery({
-    queryKey: ['testing'],
-    queryFn: fetchData,
-    retry: false
-  });
+  const [currView, setCurrView] = useState("Default")
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>;
+  const renderBody = () => {
+    switch(currView) {
+      case 'exercises':
+        return <RenderAllExercises/>;
+      case 'musclegroups':
+        return <RenderAllMuscleGroups/>;
+      default:
+        return <p> Default View </p>;
+    }
+  }
 
   return (
-    <div>
-      <h1>Backend Data Test</h1>
-      <Container>
-        <Row>
-          {data?.map((exercise) => (
-            <Col key={exercise.id}>
-              <Card>
-                <Card.Title> Exercise ID: {exercise.id} </Card.Title>
-                <Card.Text> Exercise Name: {exercise.exerciseName} </Card.Text>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Container>
+    <div className="p-4">
+      <h1> Hello World </h1>
+      <div className="container">
+        <div className= "row">
+          <div className = "col-2">
+            <Button onClick={() => setCurrView("exercises")}> Get Exercises </Button>
+          </div>
+          <div className = "col-2"><Button onClick={() => setCurrView("musclegroups")}> Get Muscle Groups </Button></div>
+        </div>
+      </div>
+      <div>
+        {renderBody()}
+      </div>
     </div>
   ); 
 }
