@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { Button, Col, Container, Row } from 'react-bootstrap';
 import RenderAllExercises from './Components/RenderAllExercises';
 import RenderAllMuscleGroups from './Components/RenderAllMuscleGroups';
+import CreateExercise from './Components/CreateExercise';
 
 
 function App() {
@@ -10,9 +10,11 @@ function App() {
   const renderBody = () => {
     switch(currView) {
       case 'exercises':
-        return <RenderAllExercises/>;
+        return <RenderAllExercises />;
       case 'musclegroups':
-        return <RenderAllMuscleGroups/>;
+        return <RenderAllMuscleGroups />;
+      case 'createExercise':
+        return <CreateExercise />
       default:
         return <p> Default View </p>;
     }
@@ -24,11 +26,16 @@ function App() {
       <div className="container">
         <div className= "row">
           <div className = "col-2">
-            <Button onClick={() => setCurrView("exercises")}> Get Exercises </Button>
+            <div className="btn btn-primary" onClick={() => setCurrView("exercises")}> Get Exercises </div>
           </div>
-          <div className = "col-2"><Button onClick={() => setCurrView("musclegroups")}> Get Muscle Groups </Button></div>
+          <div className = "col-2">
+            <div className="btn btn-primary" onClick={() => setCurrView("musclegroups")}> Get Muscle Groups </div>
+          </div>
+          <div className = "col-2">
+            <div className="btn btn-primary" onClick={() => setCurrView("createExercise")}> Create New Exercise </div>
+          </div>
         </div>
-      </div>
+      </div>  
       <div>
         {renderBody()}
       </div>

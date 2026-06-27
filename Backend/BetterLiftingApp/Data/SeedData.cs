@@ -66,7 +66,16 @@ namespace BetterLiftingApp.Data
                 Id = 12,
                 Name = "Traps"
             },          
-            
+            new MuscleGroup
+            {
+                Id = 13,
+                Name = "Glutes"
+            },
+            new MuscleGroup
+            {
+                Id = 14,
+                Name = "Lower Back"
+            }
         };
     
     }
