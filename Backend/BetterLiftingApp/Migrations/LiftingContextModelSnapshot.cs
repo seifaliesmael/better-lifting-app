@@ -148,7 +148,7 @@ namespace BetterLiftingApp.Migrations
                     b.Property<DateTime>("Start")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserID")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -240,7 +240,7 @@ namespace BetterLiftingApp.Migrations
                         .IsRequired();
 
                     b.HasOne("BetterLiftingApp.Models.Workout", "Workout")
-                        .WithMany()
+                        .WithMany("WorkoutExercises")
                         .HasForeignKey("WorkoutId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -253,7 +253,7 @@ namespace BetterLiftingApp.Migrations
             modelBuilder.Entity("BetterLiftingApp.Models.WorkoutSet", b =>
                 {
                     b.HasOne("BetterLiftingApp.Models.WorkoutExercise", "WorkoutExercise")
-                        .WithMany("Sets")
+                        .WithMany("WorkoutSets")
                         .HasForeignKey("WorkoutExerciseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -276,9 +276,14 @@ namespace BetterLiftingApp.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("BetterLiftingApp.Models.Workout", b =>
+                {
+                    b.Navigation("WorkoutExercises");
+                });
+
             modelBuilder.Entity("BetterLiftingApp.Models.WorkoutExercise", b =>
                 {
-                    b.Navigation("Sets");
+                    b.Navigation("WorkoutSets");
                 });
 #pragma warning restore 612, 618
         }

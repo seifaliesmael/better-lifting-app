@@ -1,19 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import {Card } from 'react-bootstrap'
-import { ListRender } from './Rendering';
+import React from 'react'
+import type { Exercise } from '../../Components/Interfaces';
+import { equipmentTypes } from '../../Components/Interfaces';
+import { ListRender } from '../../Components/Rendering';
+import { Card } from 'react-bootstrap';
 
-const equipmentTypes:string[] = ["Barbell", "Straight Bar", "Dumbbell", "Machine"]
-
-interface Exercise  {
-  id: number,
-  exerciseName: string,
-  muscleGroups: MuscleGroup[]
-  equipmentType: number
-}
-interface MuscleGroup {
-  id: number,
-  name: string
-}
 
 const fetchAllExercises = async (): Promise<Exercise[]> => {
   const response = await fetch('http://localhost:5240/api/exercises');
@@ -21,8 +12,8 @@ const fetchAllExercises = async (): Promise<Exercise[]> => {
   return response.json();
 };
 
-const RenderAllExercises = () => {
-  const { data, isLoading, error} = useQuery({
+const ExerciseList = () => {
+    const { data, isLoading, error} = useQuery({
     queryKey: ['fetchExercises'],
     queryFn: fetchAllExercises,
     retry: false
@@ -30,7 +21,7 @@ const RenderAllExercises = () => {
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
-  if (!data) return <p>No data found for muscle groups</p>;
+  if (!data) return <p>No exercises found</p>;
 
   return (
     <ListRender 
@@ -49,5 +40,4 @@ const RenderAllExercises = () => {
   );
 }
 
-
-export default RenderAllExercises
+export default ExerciseList

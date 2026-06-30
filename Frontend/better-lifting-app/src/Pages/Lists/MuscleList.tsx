@@ -1,7 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
-import { Card } from "react-bootstrap";
-import type { MuscleGroup } from "./Interfaces";
-import { ListRender } from "./Rendering";
+import { useQuery } from '@tanstack/react-query';
+import { ListRender } from '../../Components/Rendering';
+import { Card } from 'react-bootstrap';
+import type { MuscleGroup } from '../../Components/Interfaces';
 
 
 const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
@@ -10,18 +10,15 @@ const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
   return response.json();
 };
 
-
-const RenderAllMuscleGroups = () => {
+const MuscleList = () => {
   const { data, isLoading, error} = useQuery({
     queryKey: ['fetchMuscleGroups'],
     queryFn: fetchAllMuscleGroups,
     retry: false
   });
 
-
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
-
   if (!data) return <p>No data found for muscle groups</p>;
 
   return (
@@ -40,4 +37,4 @@ const RenderAllMuscleGroups = () => {
   );
 }
 
-export default RenderAllMuscleGroups
+export default MuscleList

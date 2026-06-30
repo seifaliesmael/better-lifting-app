@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button, Dropdown } from 'react-bootstrap'
-import type { MuscleGroup } from "./Interfaces";
+import { equipmentTypes, type MuscleGroup } from "../../Components/Interfaces";
 
 interface SelectedMuscleGroup extends MuscleGroup {
   selected: boolean,
@@ -12,8 +12,6 @@ interface CreateExercisePayload {
   muscleGroupIDs: number[]
   equipmentType: number
 }
-const equipmentTypes: string[] = ["Barbell", "Straight Bar", "Dumbbell", "Machine"]
-
 const CreateExercise = () => {
 
   // Load Data

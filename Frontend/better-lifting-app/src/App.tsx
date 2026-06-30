@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import RenderAllExercises from './Components/RenderAllExercises';
-import RenderAllMuscleGroups from './Components/RenderAllMuscleGroups';
-import CreateExercise from './Components/CreateExercise';
+import CreateExercise from './Pages/Create/CreateExercise';
+import ExerciseList from './Pages/Lists/ExerciseList';
+import MuscleList from './Pages/Lists/MuscleList';
 
 
 function App() {
@@ -10,9 +10,9 @@ function App() {
   const renderBody = () => {
     switch(currView) {
       case 'exercises':
-        return <RenderAllExercises />;
+        return <ExerciseList />;
       case 'musclegroups':
-        return <RenderAllMuscleGroups />;
+        return <MuscleList />;
       case 'createExercise':
         return <CreateExercise />
       default:

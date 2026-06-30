@@ -17,7 +17,7 @@ namespace BetterLiftingApp.Data
             // Seed Muscle Groups
             modelBuilder.Entity<MuscleGroup>().HasData(SeedData.MuscleGroups);
 
-            // Exercises is one-to-many
+            // Exercises is many-to-many but we dont need the pointer from musclegroups back to exercise
             modelBuilder.Entity<Exercise>()
             .HasMany(e => e.MuscleGroups)
             .WithMany(); // unidirectional 
