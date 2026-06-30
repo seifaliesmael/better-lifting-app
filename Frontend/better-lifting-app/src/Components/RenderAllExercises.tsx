@@ -1,7 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
-import {Card, Col, Container, Row } from 'react-bootstrap'
+import {Card } from 'react-bootstrap'
+import { ListRender } from './Rendering';
 
-interface Exercise {
+const equipmentTypes:string[] = ["Barbell", "Straight Bar", "Dumbbell", "Machine"]
+
+interface Exercise  {
   id: number,
   exerciseName: string,
   muscleGroups: MuscleGroup[]
@@ -27,28 +30,24 @@ const RenderAllExercises = () => {
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
+  if (!data) return <p>No data found for muscle groups</p>;
 
   return (
-    <div>
-      <h1> Exercises </h1>
-      <Container>
-        <Row>
-          {data?.map((exercise) => (
-            <Col key={exercise.id}>
-              <Card>
-                <Card.Body>
-                  <Card.Title> Exercise ID: {exercise.id} </Card.Title>
-                  <Card.Text> Exercise Name: {exercise.exerciseName} </Card.Text>
-                  <Card.Text> Equipment Type: {exercise.equipmentType} </Card.Text>
-                  <Card.Text> Muscle Groups: <br/> {exercise.muscleGroups.map(m => m.name).join(", ")} </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Container>
-    </div>
-  ); 
+    <ListRender 
+      data={data} 
+      title="Exercises"
+      renderData= {
+          (e) => (
+            <>
+              <Card.Title> <h4> {e.exerciseName} </h4> </Card.Title>
+              <Card.Text> Equipment Type: {equipmentTypes[e.equipmentType]} </Card.Text>
+              <Card.Text> Muscle Groups: <br /> {e.muscleGroups.length > 0 ? e.muscleGroups.map(m => m.name).join(", ") : "No Muscle Groups Defined"} </Card.Text>
+            </>
+        )
+      }
+    />
+  );
 }
+
 
 export default RenderAllExercises

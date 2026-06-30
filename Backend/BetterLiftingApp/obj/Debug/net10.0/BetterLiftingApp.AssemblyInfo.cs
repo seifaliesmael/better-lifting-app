@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("BetterLiftingApp")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+ebc2806c764ac337a89309c5ecefa46bad60b220")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7afb87e946e5d35192bf2b26c0c5403960486ab9")]
 [assembly: System.Reflection.AssemblyProductAttribute("BetterLiftingApp")]
 [assembly: System.Reflection.AssemblyTitleAttribute("BetterLiftingApp")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

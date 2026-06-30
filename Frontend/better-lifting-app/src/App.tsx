@@ -23,22 +23,31 @@ function App() {
   return (
     <div className="p-4">
       <h1> Hello World </h1>
+
       <div className="container">
+
         <div className= "row">
+
           <div className = "col-2">
             <div className="btn btn-primary" onClick={() => setCurrView("exercises")}> Get Exercises </div>
           </div>
+
           <div className = "col-2">
             <div className="btn btn-primary" onClick={() => setCurrView("musclegroups")}> Get Muscle Groups </div>
           </div>
+
           <div className = "col-2">
             <div className="btn btn-primary" onClick={() => setCurrView("createExercise")}> Create New Exercise </div>
           </div>
+
         </div>
-      </div>  
-      <div>
+
+      </div>
+
+      <div className="container d-flex justify-content-center mt-5">
         {renderBody()}
       </div>
+      
     </div>
   ); 
 }

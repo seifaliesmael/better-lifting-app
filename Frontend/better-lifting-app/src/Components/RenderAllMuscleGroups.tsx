@@ -1,10 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import { Card } from "react-bootstrap";
+import type { MuscleGroup } from "./Interfaces";
+import { ListRender } from "./Rendering";
 
-interface MuscleGroup {
-  id: number,
-  name: string
-}
 
 const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
   const response = await fetch('http://localhost:5240/api/musclegroups');
@@ -24,25 +22,22 @@ const RenderAllMuscleGroups = () => {
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
 
+  if (!data) return <p>No data found for muscle groups</p>;
+
   return (
-    <div>
-      <h1> Muscle Groups </h1>
-      <Container>
-        <Row>
-          {data?.map((muscleGroup) => (
-            <Col key={muscleGroup.id}>
-              <Card>
-                <Card.Body>
-                  <Card.Title> ID: {muscleGroup.id} </Card.Title>
-                  <Card.Text> Name: {muscleGroup.name} </Card.Text>
-                </Card.Body>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-      </Container>
-    </div>
-  ); 
+    <ListRender 
+      data={data} 
+      title="Muscle Groups"
+      renderData= {
+        (m) => (
+          <>
+            <Card.Title> <h4> {m.name} </h4> </Card.Title>
+            <Card.Text> Placeholder description</Card.Text>
+          </>
+        )
+      }
+    />
+  );
 }
 
 export default RenderAllMuscleGroups
