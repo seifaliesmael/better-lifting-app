@@ -66,7 +66,7 @@ const CreateExercise = () => {
 
 
   const equipmentSelect = (
-    <Dropdown className="mt-4 btn-primary">
+    <Dropdown className="mt-4">
       <Dropdown.Toggle variant={exType == -1 ? "secondary" : "success"} id="dropdown-basic">
         Equipment Type
       </Dropdown.Toggle>
@@ -80,7 +80,7 @@ const CreateExercise = () => {
   )
 
   const musclesSelect = (
-    <Dropdown className="mt-4 btn-primary" autoClose="outside">
+    <Dropdown className="mt-4" autoClose="outside">
       <Dropdown.Toggle variant={activeMuscleGroups.length == 0 ? "secondary" : "success"} id="dropdown-muscles">
         Muscle Groups
       </Dropdown.Toggle>

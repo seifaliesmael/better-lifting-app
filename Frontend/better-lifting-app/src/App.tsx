@@ -2,6 +2,9 @@ import { useState } from 'react'
 import CreateExercise from './Pages/Create/CreateExercise';
 import ExerciseList from './Pages/Lists/ExerciseList';
 import MuscleList from './Pages/Lists/MuscleList';
+import Navbar from './Components/Navbar';
+import WorkoutList from './Pages/Lists/WorkoutList';
+import CreateWorkout from './Pages/Create/CreateWorkout';
 
 
 function App() {
@@ -13,8 +16,12 @@ function App() {
         return <ExerciseList />;
       case 'musclegroups':
         return <MuscleList />;
+      case 'workouts':
+          return <WorkoutList />;
       case 'createExercise':
-        return <CreateExercise />
+        return <CreateExercise />;
+      case 'createWorkout':
+        return <CreateWorkout />;
       default:
         return <p> Default View </p>;
     }
@@ -24,25 +31,7 @@ function App() {
     <div className="p-4">
       <h1> Hello World </h1>
 
-      <div className="container">
-
-        <div className= "row">
-
-          <div className = "col-2">
-            <div className="btn btn-primary" onClick={() => setCurrView("exercises")}> Get Exercises </div>
-          </div>
-
-          <div className = "col-2">
-            <div className="btn btn-primary" onClick={() => setCurrView("musclegroups")}> Get Muscle Groups </div>
-          </div>
-
-          <div className = "col-2">
-            <div className="btn btn-primary" onClick={() => setCurrView("createExercise")}> Create New Exercise </div>
-          </div>
-
-        </div>
-
-      </div>
+      <Navbar updateFn={setCurrView} />
 
       <div className="container d-flex justify-content-center mt-5">
         {renderBody()}

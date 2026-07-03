@@ -11,7 +11,7 @@ const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
 };
 
 const MuscleList = () => {
-  const { data, isLoading, error} = useQuery({
+  const { data, isLoading, error } = useQuery({
     queryKey: ['fetchMuscleGroups'],
     queryFn: fetchAllMuscleGroups,
     retry: false
@@ -22,10 +22,10 @@ const MuscleList = () => {
   if (!data) return <p>No data found for muscle groups</p>;
 
   return (
-    <ListRender 
-      data={data} 
+    <ListRender
+      data={data}
       title="Muscle Groups"
-      renderData= {
+      renderData={
         (m) => (
           <>
             <Card.Title> <h4> {m.name} </h4> </Card.Title>

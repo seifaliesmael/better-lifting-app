@@ -13,6 +13,7 @@ interface MuscleGroup extends DisplayObject{
 
 interface Workout extends DisplayObject {
   userID:number;
+  name:string;
   notes?:string;
   start:Date;
   end:Date;
