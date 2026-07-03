@@ -5,6 +5,7 @@ import MuscleList from './Pages/Lists/MuscleList';
 import Navbar from './Components/Navbar';
 import WorkoutList from './Pages/Lists/WorkoutList';
 import CreateWorkout from './Pages/Create/CreateWorkout';
+import { Card } from 'react-bootstrap';
 
 
 function App() {
@@ -29,7 +30,8 @@ function App() {
 
   return (
     <div className="p-4">
-      <h1> Hello World </h1>
+      <h1 className="fw-bold"> MesoPal </h1>
+      <p className="fs-5" style={{fontStyle:"italic"}}> A better lifting app </p>
 
       <Navbar updateFn={setCurrView} />
 

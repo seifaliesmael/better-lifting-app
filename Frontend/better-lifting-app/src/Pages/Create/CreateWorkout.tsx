@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Exercise } from "../../Components/Interfaces";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Col, Dropdown, Row } from "react-bootstrap";
+import { Button, Card, Col, Container, Dropdown, Row } from "react-bootstrap";
 import type {
   CreateWorkoutExercisePayload,
   CreateWorkoutPayload,
@@ -91,7 +91,7 @@ const CreateWorkout = () => {
   };
 
   const pushPayload = async (exercises: ExerciseCreateDisplay[]) => {
-    const payload:CreateWorkoutPayload = {
+    const payload: CreateWorkoutPayload = {
       userID: 1,
       name: workoutName,
       notes: notes,
@@ -200,11 +200,17 @@ const CreateWorkout = () => {
 
               <Dropdown.Menu
                 className="overflow-scroll"
-                style={{ maxHeight: "150px", minWidth:"75px", maxWidth: "75px" }}
+                style={{
+                  maxHeight: "150px",
+                  minWidth: "75px",
+                  maxWidth: "75px",
+                }}
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
                   (num, index) => (
-                    <Dropdown.Item className="text-center" style={{fontSize:"18px"}}
+                    <Dropdown.Item
+                      className="text-center"
+                      style={{ fontSize: "18px" }}
                       key={index}
                       onClick={() => updateSetReps(exIndex, setIndex, num)}
                     >
@@ -227,7 +233,9 @@ const CreateWorkout = () => {
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
                   (num, index) => (
-                    <Dropdown.Item className="text-center" style={{fontSize:"18px"}}
+                    <Dropdown.Item
+                      className="text-center"
+                      style={{ fontSize: "18px" }}
                       key={index}
                       onClick={() => updateSetWeight(exIndex, setIndex, num)}
                     >
@@ -298,55 +306,41 @@ const CreateWorkout = () => {
   };
 
   return (
-    <div className="container mt-4">
-      <h1> Save Workout </h1>
-      <div className="container">
-        <div className="row">
-          <div className="col-6">
-            <form>
-              <div className="form-group">
-                <label htmlFor="workoutName"> Workout Name </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={workoutName}
-                  onChange={handleChangeName}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="notes"> Notes (optional) </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={notes}
-                  onChange={handleChangeNotes}
-                />
-              </div>
-
-              <div className="container">
-                {workoutExercises?.map((ex, index) => exDisplay(ex, index))}
-              </div>
-
-              <div className="d-flex">
-                {addExerciseButton}
-                {pushButton()}
-              </div>
-            </form>
+    <>
+      <Container className="container">
+        <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
+        <p className="text-muted fw-semibold"> {new Date(startTime).toDateString()} </p>
+        <form>
+          <div className="form-group">
+            <label htmlFor="workoutName"> Workout Name </label>
+            <input
+              type="text"
+              className="form-control"
+              value={workoutName}
+              onChange={handleChangeName}
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="notes"> Notes (optional) </label>
+            <input
+              type="text"
+              className="form-control"
+              value={notes}
+              onChange={handleChangeNotes}
+            />
           </div>
 
-          {/* Display (right column) */}
-          <div className="col-6">
-            <h2> {workoutName == "" ? "Untitled Workout" : workoutName}</h2>
-            <p>
-              {" "}
-              {/* {payload
-                ? JSON.stringify(payload)
-                : "None"}{" "} */}
-            </p>
+          <Container>
+            {workoutExercises?.map((ex, index) => exDisplay(ex, index))}
+          </Container>
+
+          <div className="d-flex">
+            {addExerciseButton}
+            {pushButton()}
           </div>
-        </div>
-      </div>
-    </div>
+        </form>
+      </Container>
+    </>
   );
 };
 
