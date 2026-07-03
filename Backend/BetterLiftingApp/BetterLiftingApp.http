@@ -18,3 +18,7 @@ Content-Type:application/json
     "muscleGroupIDs": [8, 3],
     "equipmentType" : 2
 }
+
+### 
+GET {{root}}/api/workouts
+Accept: application/json

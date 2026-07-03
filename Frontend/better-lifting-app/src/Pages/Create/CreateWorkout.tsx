@@ -91,7 +91,7 @@ const CreateWorkout = () => {
   };
 
   const pushPayload = async (exercises: ExerciseCreateDisplay[]) => {
-    const payload = {
+    const payload:CreateWorkoutPayload = {
       userID: 1,
       name: workoutName,
       notes: notes,
@@ -200,11 +200,11 @@ const CreateWorkout = () => {
 
               <Dropdown.Menu
                 className="overflow-scroll"
-                style={{ maxHeight: "100px", maxWidth: "50px" }}
+                style={{ maxHeight: "150px", minWidth:"75px", maxWidth: "75px" }}
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
                   (num, index) => (
-                    <Dropdown.Item
+                    <Dropdown.Item className="text-center" style={{fontSize:"18px"}}
                       key={index}
                       onClick={() => updateSetReps(exIndex, setIndex, num)}
                     >
@@ -223,15 +223,15 @@ const CreateWorkout = () => {
 
               <Dropdown.Menu
                 className="overflow-scroll"
-                style={{ maxHeight: "100px", maxWidth: "50px" }}
+                style={{ maxHeight: "150px", maxWidth: "50px" }}
               >
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
                   (num, index) => (
-                    <Dropdown.Item
+                    <Dropdown.Item className="text-center" style={{fontSize:"18px"}}
                       key={index}
                       onClick={() => updateSetWeight(exIndex, setIndex, num)}
                     >
-                      {num}
+                      {num + " KG"}
                     </Dropdown.Item>
                   ),
                 )}

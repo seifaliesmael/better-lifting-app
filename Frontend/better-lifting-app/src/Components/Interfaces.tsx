@@ -23,6 +23,7 @@ interface Workout extends DisplayObject {
 interface WorkoutExercise extends DisplayObject {
   order:number;
   exerciseId:number;
+  name?:string;
   workoutSets:WorkoutSet[];
 }
 

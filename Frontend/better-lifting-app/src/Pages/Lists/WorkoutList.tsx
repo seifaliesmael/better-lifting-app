@@ -1,7 +1,7 @@
 import type { Workout } from '../../Components/Interfaces';
 import { useQuery } from '@tanstack/react-query';
 import { ListRender } from '../../Components/Rendering';
-import { Card } from 'react-bootstrap';
+import { Card, Row, Col } from 'react-bootstrap';
 
 const fetchAllWorkouts = async (): Promise<Workout[]> => {
     const response = await fetch('http://localhost:5240/api/workouts');
@@ -28,7 +28,29 @@ const WorkoutList = () => {
                 (w) => (
                     <>
                         <Card.Title> <h4> {w.name} </h4> </Card.Title>
-                        <Card.Text> Number of sets: {w.workoutExercises.length} </Card.Text>
+                        <hr />
+                        {w.workoutExercises.map((we, exIndex) => (
+                            <div key={exIndex} className="mt-4 mb-2">
+                                <h5> {we.name}</h5>
+                                {we.workoutSets.map((set, setIndex) => (
+                                    <Card key={setIndex} className="mt-2 ms-3">
+                                        <Card.Body style={{ background: "#eeeeee", padding: "10px" }}>
+                                            <Card.Title style={{ fontSize: "1rem" }}> 
+                                                Set {setIndex + 1} 
+                                            </Card.Title>
+                                            <Row>
+                                                <Col>
+                                                    <Card.Text> Reps: {set.reps} </Card.Text>
+                                                </Col>
+                                                <Col>
+                                                    <Card.Text> Weight: {set.weight} KG </Card.Text>
+                                                </Col>
+                                            </Row>
+                                        </Card.Body>
+                                    </Card>
+                                ))}
+                            </div>
+                        ))}
                     </>
                 )
             }
@@ -36,4 +58,4 @@ const WorkoutList = () => {
     )
 }
 
-export default WorkoutList
+export default WorkoutList;

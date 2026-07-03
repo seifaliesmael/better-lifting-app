@@ -15,24 +15,6 @@ namespace BetterLiftingApp.Controllers
             context = _context;
         }
 
-        // static private List<MuscleGroup> MuscleGroups = new List<MuscleGroup>
-        // {
-        //     new MuscleGroup
-        //     {
-        //         Id = 1,
-        //         MuscleGroupName = "MuscleGroup One"
-        //     },
-        //     new MuscleGroup
-        //     {
-        //         Id = 2,
-        //         MuscleGroupName = "MuscleGroup Two"
-        //     },  
-        //     new MuscleGroup
-        //     {
-        //         Id = 3,
-        //         MuscleGroupName = "MuscleGroup Three"
-        //     },  
-        // };
 
         [HttpGet]
         public async Task<ActionResult<List<MuscleGroup>>> GetAllMuscleGroups()
