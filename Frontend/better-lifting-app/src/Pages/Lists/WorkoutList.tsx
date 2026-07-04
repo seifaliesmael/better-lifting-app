@@ -2,7 +2,8 @@ import type { Workout } from "../../Components/Interfaces";
 import { useQuery } from "@tanstack/react-query";
 import { ListRender } from "../../Components/Rendering";
 import { Card, Row, Col, Button, Modal } from "react-bootstrap";
-import { useState } from "react";
+import { useContext, useState } from "react";
+import { ThemeContext } from "../../contexts/theme/ThemeContext";
 
 const fetchAllWorkouts = async (): Promise<Workout[]> => {
   const response = await fetch("http://localhost:5240/api/workouts");
@@ -18,13 +19,17 @@ const WorkoutList = () => {
   });
 
   const [showWorkout, setShowWorkout] = useState<boolean>(false);
-  const [currWorkout, setCurrWorkout] = useState<Workout | undefined>(undefined);
+  const [currWorkout, setCurrWorkout] = useState<Workout | undefined>(
+    undefined,
+  );
+  const { theme } = useContext(ThemeContext);
 
   if (workoutListResponse.isLoading) return <p>Loading...</p>;
-  if (workoutListResponse.error) return <p>Error: {workoutListResponse.error.message}</p>;
+  if (workoutListResponse.error)
+    return <p>Error: {workoutListResponse.error.message}</p>;
   if (!workoutListResponse.data) return <p>No workouts in DB. </p>;
 
-    const handleShow = () => {
+  const handleShow = () => {
     setShowWorkout(true);
   };
   const handleClose = () => {
@@ -32,7 +37,14 @@ const WorkoutList = () => {
   };
 
   const workoutDisplay = (
-    <Modal show={showWorkout} onHide={handleClose}>
+    <Modal
+      show={showWorkout}
+      onHide={handleClose}
+      data-bs-theme={theme}
+      contentClassName={
+        theme === "light" ? "bg-white text-dark" : "bg-dark-subtle text-white"
+      }
+    >
       <Modal.Header closeButton>
         <Modal.Title> {currWorkout?.name} </Modal.Title>
       </Modal.Header>
@@ -42,7 +54,7 @@ const WorkoutList = () => {
             <h5> {we.name}</h5>
             {we.workoutSets.map((set, setIndex) => (
               <Card key={setIndex} className="mt-2 ms-3">
-                <Card.Body style={{ background: "#eeeeee", padding: "10px" }}>
+                <Card.Body style={{padding: "10px"}}>
                   <Card.Title style={{ fontSize: "1rem" }}>
                     Set {setIndex + 1}
                   </Card.Title>
@@ -69,11 +81,14 @@ const WorkoutList = () => {
   );
   return (
     <>
-    {workoutDisplay}
+      {workoutDisplay}
       <ListRender
         data={workoutListResponse.data}
         title="Workouts"
-        onClick={(w) => {setCurrWorkout(w); handleShow();}}
+        onClick={(w) => {
+          setCurrWorkout(w);
+          handleShow();
+        }}
         renderData={(w) => (
           <>
             <Card.Title>
@@ -82,12 +97,24 @@ const WorkoutList = () => {
             </Card.Title>
             <hr />
             <Row>
-                <Col>
-                    <Card.Text> Date: {new Date(w.start).toDateString()} </Card.Text>
-                </Col>
-                <Col className="text-end">
-                    <Button variant="secondary" onClick={() => {setCurrWorkout(w); handleShow();}}> Show Details </Button>
-                </Col>
+              <Col>
+                <Card.Text>
+                  {" "}
+                  Date: {new Date(w.start).toDateString()}{" "}
+                </Card.Text>
+              </Col>
+              <Col className="text-end">
+                <Button
+                  variant="secondary"
+                  onClick={() => {
+                    setCurrWorkout(w);
+                    handleShow();
+                  }}
+                >
+                  {" "}
+                  Show Details{" "}
+                </Button>
+              </Col>
             </Row>
           </>
         )}
