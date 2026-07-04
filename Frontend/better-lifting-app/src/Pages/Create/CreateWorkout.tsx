@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Exercise } from "../../Components/Interfaces";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Container, Dropdown } from "react-bootstrap";
+import { Button, Card, Container, Dropdown, Form, FormControl, InputGroup } from "react-bootstrap";
 import type {
   CreateWorkoutExercisePayload,
   CreateWorkoutPayload,
@@ -131,7 +131,7 @@ const CreateWorkout = () => {
   const pushPayload = async (exercises: ExerciseCreateDisplay[]) => {
     const payload: CreateWorkoutPayload = {
       userID: 1,
-      name: workoutName,
+      name: workoutName ? workoutName : startTime.toDateString(),
       notes: notes,
       start: startTime,
       end: new Date(),
@@ -226,54 +226,76 @@ const CreateWorkout = () => {
       <Card.Body style={{ background: "#eeeeee" }}>
         <Card.Title> Set {setIndex + 1} </Card.Title>
         <div className="d-flex align-items-center gap-3">
-            <Dropdown className="mt-4">
-              <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-                {set.reps == -1
-                  ? "Reps"
-                  : set.reps == 1
-                    ? set.reps + " rep"
-                    : set.reps + " reps"}
-              </Dropdown.Toggle>
+            
+            {/* Reps Selection*/}
+            <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle style={{maxWidth:100, minWidth:100}} variant="secondary" id="dropdown-basic">
+                  {set.reps == -1
+                    ? "Reps"
+                    : set.reps == 1
+                      ? set.reps + " rep"
+                      : set.reps + " reps"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "100px",
+                    maxWidth: "100px",
+                    padding:0,
+                  }}
+                >
+                  <List
+                    style={{ height: 150, width: "100%"}}
+                    rowComponent={RepRow}
+                    rowCount={1000}
+                    rowHeight={35}
+                   rowProps={{ exIndex, setIndex, updateFn: updateSetReps }}
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+              <Form.Control
+              placeholder=""
+              type="number"
+              aria-label="Reps"
+              style={{minWidth:75, maxWidth:5}}
+              value={set.reps == -1 ? "" : set.reps}
+              onChange={(e) => updateSetReps(exIndex, setIndex, Number(e.target.value))}
+              />
+            </InputGroup>
 
-              <Dropdown.Menu
-                style={{
-                  maxHeight: "150px",
-                  minWidth: "100px",
-                  maxWidth: "100px",
-                  padding:0,
-                }}
-              >
-                <List
-                  style={{ height: 150, width: "100%"}}
-                  rowComponent={RepRow}
+            {/* Weight Selection*/}
+            <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle style={{maxWidth:100, minWidth:100}} variant="secondary" id="dropdown-basic">
+                  {set.weight == -1 ? "Weight" : set.weight + " kg"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "100px",
+                    maxWidth: "100px",
+                    padding:0,
+                  }}
+                >
+                  <List
+                  style={{ height: 150, width: "100%" }}
+                  rowComponent={WeightRow}
                   rowCount={1000}
                   rowHeight={35}
-                 rowProps={{ exIndex, setIndex, updateFn: updateSetReps }}
-                />
-              </Dropdown.Menu>
-            </Dropdown>
-            <Dropdown className="mt-4">
-              <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-                {set.weight == -1 ? "Weight" : set.weight + " kg"}
-              </Dropdown.Toggle>
-
-              <Dropdown.Menu
-                style={{ 
-                  maxHeight: "150px",
-                  minWidth: "100px",
-                  maxWidth: "100px",
-                  padding:0,
-                }}
-              >
-                <List
-                style={{ height: 150, width: "100%" }}
-                rowComponent={WeightRow}
-                rowCount={1000}
-                rowHeight={35}
-                rowProps={{exIndex, setIndex, updateFn:updateSetWeight}}
-                />
-              </Dropdown.Menu>
-            </Dropdown>
+                  rowProps={{exIndex, setIndex, updateFn:updateSetWeight}}
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+              <Form.Control
+              placeholder=""
+              type="number"
+              aria-label="Weight"
+              style={{minWidth:75, maxWidth:75}}
+              value={set.weight == -1 ? "" : set.weight}
+              onChange={(e) => updateSetWeight(exIndex, setIndex, Number(e.target.value))}
+              />
+            </InputGroup>
         </div>
       </Card.Body>
     </Card>
@@ -342,15 +364,16 @@ const CreateWorkout = () => {
           {new Date(startTime).toDateString()}{" "}
         </p>
         <form>
-          <div className="form-group">
-            <label htmlFor="workoutName"> Workout Name </label>
-            <input
-              type="text"
-              className="form-control"
-              value={workoutName}
-              onChange={handleChangeName}
-            />
-          </div>
+            <Form.Label className="mb-0 pb-0" htmlFor="workoutName"> Workout Name </Form.Label>
+            <InputGroup>
+              <FormControl
+                type="text"
+                id="workoutName"
+                value={workoutName}
+                onChange={handleChangeName}
+              />
+            </InputGroup>
+            <p className={!workoutName ? "" : "fst-italic text-muted"}> Untitled workouts will be saved as the current date. </p>
           <div className="form-group">
             <label htmlFor="notes"> Notes (optional) </label>
             <input
