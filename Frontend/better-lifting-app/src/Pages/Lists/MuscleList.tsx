@@ -25,6 +25,7 @@ const MuscleList = () => {
     <ListRender
       data={data}
       title="Muscle Groups"
+      rowHeight={100}
       renderData={
         (m) => (
           <>

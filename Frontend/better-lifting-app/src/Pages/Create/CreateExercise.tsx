@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button, Dropdown } from 'react-bootstrap'
 import { equipmentTypes, type MuscleGroup } from "../../Components/Interfaces";
+import { Check2Square, Square } from 'react-bootstrap-icons';
 
 interface SelectedMuscleGroup extends MuscleGroup {
   selected: boolean,
@@ -92,7 +93,7 @@ const CreateExercise = () => {
         {muscleGroupsSelected.map(
           (m: SelectedMuscleGroup) =>
             <Dropdown.Item key={m.id} onClick={() => updateMuscleGroups(m.id)}>
-              {m.selected ? <i className="bi bi-check2-square"> </i> : <i className="bi bi-square"></i>} {m.name}
+              {m.selected ? <Check2Square className="me-2" /> : <Square className="me-2" />} {m.name}
             </Dropdown.Item>
         )
         }

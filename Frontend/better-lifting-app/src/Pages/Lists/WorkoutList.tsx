@@ -85,6 +85,7 @@ const WorkoutList = () => {
       <ListRender
         data={workoutListResponse.data}
         title="Workouts"
+        rowHeight={150}
         onClick={(w) => {
           setCurrWorkout(w);
           handleShow();
@@ -92,15 +93,13 @@ const WorkoutList = () => {
         renderData={(w) => (
           <>
             <Card.Title>
-              {" "}
-              <h4> {w.name} </h4>{" "}
+              <h4> {w.name} </h4>
             </Card.Title>
             <hr />
             <Row>
               <Col>
                 <Card.Text>
-                  {" "}
-                  Date: {new Date(w.start).toDateString()}{" "}
+                  Date: {new Date(w.start).toDateString()}
                 </Card.Text>
               </Col>
               <Col className="text-end">
@@ -111,8 +110,7 @@ const WorkoutList = () => {
                     handleShow();
                   }}
                 >
-                  {" "}
-                  Show Details{" "}
+                  Show Details
                 </Button>
               </Col>
             </Row>

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Exercise } from "../../Components/Interfaces";
 import { useQuery } from "@tanstack/react-query";
-import { Button, Card, Col, Container, Dropdown, Row } from "react-bootstrap";
+import { Button, Card, Container, Dropdown } from "react-bootstrap";
 import type {
   CreateWorkoutExercisePayload,
   CreateWorkoutPayload,

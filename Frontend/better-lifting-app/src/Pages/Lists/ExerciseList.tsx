@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query';
-import React from 'react'
 import type { Exercise } from '../../Components/Interfaces';
 import { equipmentTypes } from '../../Components/Interfaces';
 import { ListRender } from '../../Components/Rendering';
@@ -27,10 +26,13 @@ const ExerciseList = () => {
     <ListRender 
       data={data} 
       title="Exercises"
+      rowHeight={175}
       renderData= {
           (e) => (
             <>
-              <Card.Title> <h4> {e.exerciseName} </h4> </Card.Title>
+              <Card.Title> 
+                <h4> {e.exerciseName} </h4> 
+              </Card.Title>
               <Card.Text> Equipment Type: {equipmentTypes[e.equipmentType]} </Card.Text>
               <Card.Text> Muscle Groups: <br /> {e.muscleGroups.length > 0 ? e.muscleGroups.map(m => m.name).join(", ") : "No Muscle Groups Defined"} </Card.Text>
             </>
