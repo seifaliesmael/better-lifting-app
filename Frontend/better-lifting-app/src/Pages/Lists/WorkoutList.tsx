@@ -49,12 +49,23 @@ const WorkoutList = () => {
         <Modal.Title> {currWorkout?.name} </Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {currWorkout?.notes ? (
+          <Card className="mb-4">
+            <Card.Body>
+              <Card.Subtitle className="fw-bold"> Notes </Card.Subtitle>
+              <Card.Text> {currWorkout?.notes} </Card.Text>
+            </Card.Body>
+          </Card>
+        ) : (
+          ""
+        )}
+
         {currWorkout?.workoutExercises.map((we, exIndex) => (
           <div key={exIndex} className={exIndex != 0 ? "mt-4" : ""}>
             <h5> {we.name}</h5>
             {we.workoutSets.map((set, setIndex) => (
               <Card key={setIndex} className="mt-2 ms-3">
-                <Card.Body style={{padding: "10px"}}>
+                <Card.Body style={{ padding: "10px" }}>
                   <Card.Title style={{ fontSize: "1rem" }}>
                     Set {setIndex + 1}
                   </Card.Title>
@@ -98,9 +109,7 @@ const WorkoutList = () => {
             <hr />
             <Row>
               <Col>
-                <Card.Text>
-                  Date: {new Date(w.start).toDateString()}
-                </Card.Text>
+                <Card.Text>Date: {new Date(w.start).toDateString()}</Card.Text>
               </Col>
               <Col className="text-end">
                 <Button
