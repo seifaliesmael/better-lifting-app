@@ -10,7 +10,6 @@ import { Button, Col, Row } from 'react-bootstrap';
 
 function App() {
   const [currView, setCurrView] = useState("Default")
-
   const {theme, toggleTheme} = useContext(ThemeContext);
 
   const renderBody = () => {

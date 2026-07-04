@@ -63,7 +63,7 @@ const WorkoutList = () => {
                       <Card.Text> Reps: {set.reps} </Card.Text>
                     </Col>
                     <Col>
-                      <Card.Text> Weight: {set.weight} KG </Card.Text>
+                      <Card.Text> Weight: {set.weight} kg </Card.Text>
                     </Col>
                   </Row>
                 </Card.Body>

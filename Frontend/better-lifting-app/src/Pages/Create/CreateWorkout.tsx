@@ -7,6 +7,7 @@ import type {
   CreateWorkoutPayload,
   CreateWorkoutSetPayload,
 } from "../../Components/CreatePayloads";
+import { List, type RowComponentProps } from "react-window";
 
 // Payloads
 interface ExerciseCreateDisplay {
@@ -14,16 +15,62 @@ interface ExerciseCreateDisplay {
   data: CreateWorkoutExercisePayload;
 }
 
+// Dropdown prop for react-window list
+interface DropdownRowData {
+  exIndex: number;
+  setIndex: number;
+  updateFn: (exIndex: number, setIndex: number, val: number) => void;
+}
+
+// Dropdown item for reps
+const RepRow = ({ index, exIndex, setIndex, updateFn, style}: RowComponentProps<DropdownRowData>) => {
+  const num = index + 1;
+  return (
+    <Dropdown.Item
+    className="text-center"
+    style={{ ...style, fontSize: "18px" }}
+      onClick={() => updateFn(exIndex, setIndex, num)}
+      >
+      {num + " reps"}
+    </Dropdown.Item>
+  );
+};
+
+// Dropdown item for weight
+const WeightRow = ({ index, exIndex, setIndex, updateFn, style}: RowComponentProps<DropdownRowData>) => {
+  const num = index + 1;
+  return (
+    <Dropdown.Item
+    className="text-center"
+    style={{ ...style, fontSize: "18px" }}
+      onClick={() => updateFn(exIndex, setIndex, num * 2)}
+      >
+      {num * 2 + " kg"} 
+      {/* TODO- change this to times increment. rn default increment of 2kg. */}
+    </Dropdown.Item>
+  );
+};
+
+// Fetch all exercises for dropdown
+const fetchAllExercises = async (): Promise<Exercise[]> => {
+  const response = await fetch("http://localhost:5240/api/exercises");
+  if (!response.ok) throw new Error("Network error");
+  return response.json();
+};
+
+// Check if an exercise is valid (i.e, at least 1 set, set info is filled for each set.)
+const exReady = (ex: ExerciseCreateDisplay): boolean => {
+  if (!ex.data.workoutSets) return false;
+  if (
+    ex.data.workoutSets.some((s) => s.reps == -1 || s.weight == -1)
+  )
+    return false;
+  return true;
+};
+
 const CreateWorkout = () => {
   const [startTime, setStartTime] = useState(new Date());
   const [notes, setNotes] = useState("");
-
-  // Fetch all exercises for dropdown
-  const fetchAllExercises = async (): Promise<Exercise[]> => {
-    const response = await fetch("http://localhost:5240/api/exercises");
-    if (!response.ok) throw new Error("Network error");
-    return response.json();
-  };
 
   const handleChangeName = (e: any) => {
     setWorkoutName(e.target.value);
@@ -65,15 +112,6 @@ const CreateWorkout = () => {
   };
 
   const pushButton = () => {
-    const exReady = (ex: ExerciseCreateDisplay): boolean => {
-      if (!ex.data.workoutSets) return false;
-      if (
-        ex.data.workoutSets.filter((s) => s.reps == -1 || s.weight == -1)
-          .length > 0
-      )
-        return false;
-      return true;
-    };
 
     if (!workoutExercises) return false;
     const workoutReady =
@@ -187,8 +225,7 @@ const CreateWorkout = () => {
     <Card key={setIndex} className="mt-2">
       <Card.Body style={{ background: "#eeeeee" }}>
         <Card.Title> Set {setIndex + 1} </Card.Title>
-        <Row>
-          <Col>
+        <div className="d-flex align-items-center gap-3">
             <Dropdown className="mt-4">
               <Dropdown.Toggle variant="secondary" id="dropdown-basic">
                 {set.reps == -1
@@ -199,54 +236,45 @@ const CreateWorkout = () => {
               </Dropdown.Toggle>
 
               <Dropdown.Menu
-                className="overflow-scroll"
                 style={{
                   maxHeight: "150px",
-                  minWidth: "75px",
-                  maxWidth: "75px",
+                  minWidth: "100px",
+                  maxWidth: "100px",
+                  padding:0,
                 }}
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
-                  (num, index) => (
-                    <Dropdown.Item
-                      className="text-center"
-                      style={{ fontSize: "18px" }}
-                      key={index}
-                      onClick={() => updateSetReps(exIndex, setIndex, num)}
-                    >
-                      {num}
-                    </Dropdown.Item>
-                  ),
-                )}
+                <List
+                  style={{ height: 150, width: "100%"}}
+                  rowComponent={RepRow}
+                  rowCount={1000}
+                  rowHeight={35}
+                 rowProps={{ exIndex, setIndex, updateFn: updateSetReps }}
+                />
               </Dropdown.Menu>
             </Dropdown>
-          </Col>
-          <Col>
             <Dropdown className="mt-4">
               <Dropdown.Toggle variant="secondary" id="dropdown-basic">
-                {set.weight == -1 ? "Weight" : set.weight + " KG"}
+                {set.weight == -1 ? "Weight" : set.weight + " kg"}
               </Dropdown.Toggle>
 
               <Dropdown.Menu
-                className="overflow-scroll"
-                style={{ maxHeight: "150px", maxWidth: "50px" }}
+                style={{ 
+                  maxHeight: "150px",
+                  minWidth: "100px",
+                  maxWidth: "100px",
+                  padding:0,
+                }}
               >
-                {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14].map(
-                  (num, index) => (
-                    <Dropdown.Item
-                      className="text-center"
-                      style={{ fontSize: "18px" }}
-                      key={index}
-                      onClick={() => updateSetWeight(exIndex, setIndex, num)}
-                    >
-                      {num + " KG"}
-                    </Dropdown.Item>
-                  ),
-                )}
+                <List
+                style={{ height: 150, width: "100%" }}
+                rowComponent={WeightRow}
+                rowCount={1000}
+                rowHeight={35}
+                rowProps={{exIndex, setIndex, updateFn:updateSetWeight}}
+                />
               </Dropdown.Menu>
             </Dropdown>
-          </Col>
-        </Row>
+        </div>
       </Card.Body>
     </Card>
   );
@@ -309,7 +337,10 @@ const CreateWorkout = () => {
     <>
       <Container className="container">
         <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
-        <p className="text-muted fw-semibold"> {new Date(startTime).toDateString()} </p>
+        <p className="text-muted fw-semibold">
+          {" "}
+          {new Date(startTime).toDateString()}{" "}
+        </p>
         <form>
           <div className="form-group">
             <label htmlFor="workoutName"> Workout Name </label>
