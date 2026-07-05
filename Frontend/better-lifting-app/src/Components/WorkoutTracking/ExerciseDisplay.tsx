@@ -132,7 +132,6 @@ export const ExerciseDisplay = ({
           </div>
         </div>
         </Card.Title>
-        <Card.Text> Order: {ex.order} </Card.Text>
         {ex.workoutSets.length > 0 ? (
           <DragDropProvider onDragEnd={handleSetDrag}>
             <ul className="list-unstyled mb-0">
