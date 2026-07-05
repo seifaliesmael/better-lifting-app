@@ -1,7 +1,10 @@
-import type { CreateWorkoutExercisePayload } from "../Components/CreatePayloads";
+import type { LocalWorkoutExercise } from "../Pages/Create/CreateWorkout";
 
 // Check if an exercise is valid (i.e, at least 1 set, set info is filled for each set.)
-export const exerciseReady = (ex: CreateWorkoutExercisePayload): boolean => {
+export const exerciseReady = (ex: LocalWorkoutExercise): boolean => {  
+  if (!ex) return false;
+  if (!ex.workoutSets) return false;
+
   // No sets
   if (ex.workoutSets.length < 1) return false;
 

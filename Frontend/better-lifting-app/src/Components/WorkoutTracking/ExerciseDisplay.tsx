@@ -1,21 +1,22 @@
 import { type Dispatch, type SetStateAction } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import SetDisplay from "./SetDisplay";
-import type {
-  CreateWorkoutExercisePayload,
-  CreateWorkoutSetPayload,
-} from "../CreatePayloads";
-import { Trash } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, GripVertical, Trash } from "react-bootstrap-icons";
+import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Pages/Create/CreateWorkout";
+import { useSortable } from "@dnd-kit/react/sortable";
+import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
 
 interface Props {
-  workoutExercises: CreateWorkoutExercisePayload[];
+  workoutExercises: LocalWorkoutExercise[];
   setWorkoutExercises: Dispatch<
-    SetStateAction<CreateWorkoutExercisePayload[]>
+    SetStateAction<LocalWorkoutExercise[]>
   >;
-  ex: CreateWorkoutExercisePayload;
+  ex: LocalWorkoutExercise;
   exIndex: number;
   theme: string;
 }
+
 
 export const ExerciseDisplay = ({
   workoutExercises,
@@ -24,8 +25,11 @@ export const ExerciseDisplay = ({
   exIndex,
   theme,
 }: Props) => {
+  // For drag and drop
+    const {ref, handleRef} = useSortable({id:ex.id, index:exIndex});
+
   // Helpers
-  const deleteEx = (exIndex: number): void => {
+  const deleteEx = (): void => {
     if (!workoutExercises) return;
     if (!workoutExercises[exIndex]) return;
 
@@ -35,16 +39,17 @@ export const ExerciseDisplay = ({
     setWorkoutExercises(newExercises);
   };
 
-  const addSet = (exIndex: number): void => {
+  const addSet = (): void => {
     setWorkoutExercises((prev) => {
       const oldEx = prev[exIndex];
       if (!oldEx) return prev;
 
-      const newSet: CreateWorkoutSetPayload = {
+      const newSet: LocalWorkoutSet = {
         order: oldEx.workoutSets.length,
         weight: -1,
         reps: -1,
         type: -1,
+        id:crypto.randomUUID()
       };
 
       const newExercises = [...prev];
@@ -57,9 +62,52 @@ export const ExerciseDisplay = ({
     });
   };
 
+  // Move exercises up/down by one
+  const handleExMove = (direction:"up" | "down", exIndex:number) => {
+    // Edge cases
+    if ((direction === "up") && (exIndex === 0)) return; 
+    if ((direction === "down") && (exIndex === workoutExercises.length - 1)) return;
+
+    setWorkoutExercises((prev) => {
+      const newExercises = [...prev]
+            
+      // Swap with previous element
+      if (direction === "up") {
+        [newExercises[exIndex], newExercises[exIndex-1]] = [newExercises[exIndex-1], newExercises[exIndex]];
+      }
+      // Swap with next element
+      else {
+        [newExercises[exIndex], newExercises[exIndex+1]] = [newExercises[exIndex+1], newExercises[exIndex]];
+      }
+
+      return newExercises;
+    })
+  }
+
+  // Drag and drop sets
+  const handleSetDrag = (event: DragEndEvent) => {
+    if (event.canceled) return;
+    try {
+      setWorkoutExercises((prev) => {
+        const newExercises = [...prev];
+        const currentEx = newExercises[exIndex];
+        if (!currentEx) return prev;
+
+        const newSets = move(currentEx.workoutSets, event);
+        newExercises[exIndex] = { ...currentEx, workoutSets: newSets };
+
+        return newExercises;
+      });
+    } catch (err) {
+      console.log("Error in set drag and drop:", err);
+    }
+  };
+
   return (
     <Card
-      key={exIndex}
+      key={ex.id} 
+      ref={ref}
+      style={{touchAction: "none"}}
       className={`mt-4 rounded-3 ${
         theme === "light"
           ? "bg-body-tertiary text-dark"
@@ -67,26 +115,47 @@ export const ExerciseDisplay = ({
       }`}
     >
       <Card.Body>
-        <Card.Title> {ex.name} </Card.Title>
+        <Card.Title className="d-flex justify-content-between align-items-center"> 
+        <span> {ex.name} </span>
+
+        {/* Buttons */}
+        <div className="d-flex">
+          
+          {/* Move up button */}
+          <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleExMove("up", exIndex)}> <ArrowUp /> </Button>
+          {/* Move down button */}
+          <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleExMove("down", exIndex)}> <ArrowDown /> </Button>
+          {/* Drag Handle */}
+          <div ref={handleRef} style={{ cursor: "grab", touchAction: "none" }} className="p-2">
+            <GripVertical size={20} />
+
+          </div>
+        </div>
+        </Card.Title>
         <Card.Text> Order: {ex.order} </Card.Text>
         {ex.workoutSets.length > 0 ? (
-          ex.workoutSets.map((set, index) => (
-            <SetDisplay
-              exIndex={exIndex}
-              set={set}
-              setIndex={index}
-              theme={theme}
-              workoutExercises={workoutExercises}
-              setWorkoutExercises={setWorkoutExercises}
-            />
-          ))
+          <DragDropProvider onDragEnd={handleSetDrag}>
+            <ul className="list-unstyled mb-0">
+              {ex.workoutSets.map((set, index) => (
+                <SetDisplay
+                  key={set.id}
+                  set={set}
+                  setIndex={index}
+                  exIndex={exIndex}
+                  theme={theme}
+                  workoutExercises={workoutExercises}
+                  setWorkoutExercises={setWorkoutExercises}
+                />
+              ))}
+            </ul>
+          </DragDropProvider>
         ) : (
           <Card.Text> No sets added to this exercise </Card.Text>
         )}
 
         <Row>
           <Col>
-            <Button className="mt-4" onClick={() => addSet(exIndex)}>
+            <Button className="mt-4" onClick={() => addSet()}>
               Add Set
             </Button>
           </Col>
@@ -94,7 +163,7 @@ export const ExerciseDisplay = ({
             <Button
               className="me-4 mt-4"
               variant="danger"
-              onClick={() => deleteEx(exIndex)}
+              onClick={() => deleteEx()}
             >
               {" "}
               Delete Exercise

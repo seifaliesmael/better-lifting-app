@@ -1,54 +1,52 @@
-import { closestCorners, DndContext, PointerSensor, TouchSensor, useSensor, useSensors, type DragEndEvent, type UniqueIdentifier } from "@dnd-kit/core"
+import { Card, Col, Row } from "react-bootstrap";
+
+import {useSortable} from '@dnd-kit/react/sortable';
 import { useState } from "react";
-import DraggableList from "../Components/Draggable/DraggableList";
-import { arrayMove } from "@dnd-kit/sortable";
-import { Col, Row } from "react-bootstrap";
+import { DragDropProvider } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
+
+function Sortable({id, index, text}: {id:number, index:number, text:string}) {
+  const {ref} = useSortable({id, index});
+
+  return (
+    <Card ref={ref} className="item">
+      <Card.Body>
+        <Card.Title>Item {id}: {text} </Card.Title>
+      </Card.Body>
+    </Card>
+  );
+}
 
 const TestDND = () => {
   const [items, setItems] = useState([
     {id:1, text:"First item"},
     {id:2, text:"Second item"},
     {id:3, text:"Third item"},
-
   ]);
 
-  const getItemPosition = (id:UniqueIdentifier) => items.findIndex(x => x.id == id);
-  
-  const handleDragEnd = (event:DragEndEvent) => {
-    const {active, over} = event
-
-    if (active.id === over?.id) return;
-    if (!over) return;
-
-    setItems(items => {
-      const originalPos = getItemPosition(active.id);
-      const newPos = getItemPosition(over.id);
-
-      return arrayMove(items, originalPos, newPos);
-    });
-  };
-
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(TouchSensor)
-  ) // allow for mobile
-
-
   return (
-    <div>
-      <Row>
-        <Col>
-          <h1> TestDND </h1>
-          {/* collision detection is algorithm for determining which object we landed on */}
-          <DndContext sensors={sensors} onDragEnd={handleDragEnd} collisionDetection={closestCorners}> 
-              <DraggableList items={items}/>
-          </DndContext>
-        </Col>
-        <Col>
-          <p> {JSON.stringify(items)}</p>
-        </Col>
-      </Row>
-    </div>
+    <DragDropProvider
+    onDragEnd={(event) => {
+      setItems((prev) => move(prev, event));
+    }}
+    >
+      <div>
+        <Row>
+          <Col>
+            <h1> TestDND </h1>
+            <ul className="list">
+            {items.map((item, index) =>
+              <Sortable key={item.id} id={item.id} index={index} text={item.text} />
+            )}
+            </ul>
+          </Col>
+          <Col>
+            <p> {JSON.stringify(items)}</p>
+          </Col>
+        </Row>
+      </div>
+    </DragDropProvider>
+    
   )
 }
 

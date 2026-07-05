@@ -8,6 +8,7 @@ interface CreateWorkoutPayload {
 }
 
 interface CreateWorkoutExercisePayload {
+  id?:string; // Will be removed before sending to DB
   order:number;
   exerciseId:number;
   name?:string; // Will be removed before sending to DB
@@ -15,6 +16,7 @@ interface CreateWorkoutExercisePayload {
 }
 
 interface CreateWorkoutSetPayload {
+  id?:string; // Will be removed before sending to DB
   order:number;
   weight:number;
   reps:number;

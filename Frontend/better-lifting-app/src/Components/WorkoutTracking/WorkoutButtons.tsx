@@ -1,8 +1,9 @@
 import { Button, Dropdown } from "react-bootstrap";
 import type { Exercise } from "../Interfaces";
 import { exerciseReady } from "../../Utilities/workoutUtils";
-import type { CreateWorkoutExercisePayload, CreateWorkoutPayload } from "../CreatePayloads";
+import type {CreateWorkoutPayload } from "../CreatePayloads";
 import { createWorkout } from "../../api/workoutServices";
+import type { LocalWorkoutExercise } from "../../Pages/Create/CreateWorkout";
 
 interface AddExerciseProps {
     data:Exercise[] | undefined,
@@ -28,7 +29,7 @@ export const AddExerciseButton = ({data, addExercise}:AddExerciseProps) => (
   );
 
 interface SaveWorkoutProps {
-  wkExercises:CreateWorkoutExercisePayload[],
+  wkExercises:LocalWorkoutExercise[],
   workoutName:string,
   notes?:string,
   startTime:Date,
@@ -38,7 +39,7 @@ interface SaveWorkoutProps {
 export const SaveWorkoutButton = ({wkExercises, workoutName, notes, startTime, resetFields} : SaveWorkoutProps) => {
 
   // Function to push workout to DB and reset fields
-  const pushPayload = async (exercises: CreateWorkoutExercisePayload[]) => {
+  const pushPayload = async (exercises: LocalWorkoutExercise[]) => {
     const payload: CreateWorkoutPayload = {
       userID: 1,
       name: workoutName
@@ -47,7 +48,7 @@ export const SaveWorkoutButton = ({wkExercises, workoutName, notes, startTime, r
       notes: notes,
       start: startTime,
       end: new Date(),
-      workoutExercises: exercises.map(({name, ...rest}) => rest),
+      workoutExercises: exercises.map(({name, id, ...rest}, index) => ({...rest, order:index})),
     };
 
     console.log("Creating resource:", JSON.stringify(payload));
@@ -61,7 +62,7 @@ export const SaveWorkoutButton = ({wkExercises, workoutName, notes, startTime, r
   };
 
   if (!wkExercises) return;
-  const workoutReady = wkExercises.filter((ex) => !exerciseReady(ex)).length == 0;
+  const workoutReady = (wkExercises.length >= 1) && !(wkExercises.some((ex) => !exerciseReady(ex)));
 
     return (
       <Button

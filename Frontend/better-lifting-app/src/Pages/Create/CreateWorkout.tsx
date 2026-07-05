@@ -9,12 +9,24 @@ import {
 } from "react-bootstrap";
 import type {
   CreateWorkoutExercisePayload,
+  CreateWorkoutSetPayload,
 } from "../../Components/CreatePayloads";
 import { ThemeContext } from "../../contexts/theme/ThemeContext";
 import { ExerciseDisplay } from "../../Components/WorkoutTracking/ExerciseDisplay";
 import { fetchAllExercises } from "../../api/workoutServices";
 import { AddExerciseButton, SaveWorkoutButton } from "../../Components/WorkoutTracking/WorkoutButtons";
+import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
+import { move } from "@dnd-kit/helpers";
 
+// adding a temporary unique ID so that it can be made Sortable (for drag and drop)
+export interface LocalWorkoutExercise extends Omit<CreateWorkoutExercisePayload, 'workoutSets'> {
+  id: string; 
+  workoutSets:LocalWorkoutSet[]; // temporarily store localworkoutsets instead of payload sets, so we can add ID to them
+
+}
+export interface LocalWorkoutSet extends CreateWorkoutSetPayload {
+  id:string;
+}
 
 const CreateWorkout = () => {
   const { theme } = useContext(ThemeContext);
@@ -23,7 +35,7 @@ const CreateWorkout = () => {
   const [startTime, setStartTime] = useState(new Date());
   const [notes, setNotes] = useState("");
   const [workoutName, setWorkoutName] = useState("");
-  const [workoutExercises, setWorkoutExercises] = useState<CreateWorkoutExercisePayload[]>([]);
+  const [workoutExercises, setWorkoutExercises] = useState<LocalWorkoutExercise[]>([]);
 
   // Fetching all exercises from DB
   const exResult = useQuery({
@@ -37,11 +49,12 @@ const CreateWorkout = () => {
   if (!exResult.data) return <p> No exercises found in DB. </p>;
 
   const addExercise = (ex: Exercise): void => {
-    const newWorkoutEx: CreateWorkoutExercisePayload = {
+    const newWorkoutEx: LocalWorkoutExercise = {
       name: ex.exerciseName,
       order: workoutExercises ? workoutExercises.length : 0,
       exerciseId: ex.id,
       workoutSets: [],
+      id:crypto.randomUUID()
     };
     setWorkoutExercises((prev) => [...prev, newWorkoutEx]);
   };
@@ -53,10 +66,15 @@ const CreateWorkout = () => {
     setStartTime(new Date());
   };
 
+  const handleExDrag = (event:DragEndEvent) => {
+      try {setWorkoutExercises((prev) => move(prev, event))}
+      catch (err) {console.log("Error in exercise drag and drop:", err)}}
+
   return (
     <>
       <Container>
         <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
+        <p> {JSON.stringify(workoutExercises)}</p>
         <p className="text-muted fw-semibold">
           {" "}
           {new Date(startTime).toDateString()}{" "}
@@ -88,15 +106,23 @@ const CreateWorkout = () => {
             />
           </div>
 
-          {workoutExercises?.map((ex, index) => (
-            <ExerciseDisplay
-              workoutExercises={workoutExercises}
-              setWorkoutExercises={setWorkoutExercises}
-              ex={ex}
-              exIndex={index}
-              theme={theme}
-            />
-          ))}
+
+          {/* Drag and drop exercises within a workout */}
+          <DragDropProvider onDragEnd={handleExDrag}>
+            <ul className="list">
+              {workoutExercises?.map((ex, index) => (
+                <ExerciseDisplay
+                  key={ex.id}
+                  workoutExercises={workoutExercises}
+                  setWorkoutExercises={setWorkoutExercises}
+                  ex={ex}
+                  exIndex={index}
+                  theme={theme}
+                />
+              ))}
+            </ul>
+
+          </DragDropProvider>
 
           <div className="d-flex">
             <AddExerciseButton data={exResult.data} addExercise={addExercise}/>

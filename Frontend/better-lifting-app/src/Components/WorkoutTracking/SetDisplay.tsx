@@ -1,7 +1,3 @@
-import type {
-  CreateWorkoutExercisePayload,
-  CreateWorkoutSetPayload,
-} from "../CreatePayloads";
 import {
   Button,
   Card,
@@ -11,17 +7,19 @@ import {
   InputGroup,
   Row,
 } from "react-bootstrap";
-import { Trash } from "react-bootstrap-icons";
+import { ArrowDown, ArrowUp, GripHorizontal, Trash } from "react-bootstrap-icons";
 import { List, type RowComponentProps } from "react-window";
 import type { Dispatch, SetStateAction } from "react";
+import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Pages/Create/CreateWorkout";
+import { useSortable } from "@dnd-kit/react/sortable";
 
 interface Props {
-  workoutExercises: CreateWorkoutExercisePayload[];
+  workoutExercises: LocalWorkoutExercise[];
   setWorkoutExercises: Dispatch<
-    SetStateAction<CreateWorkoutExercisePayload[]>
+    SetStateAction<LocalWorkoutExercise[]>
   >;
   exIndex: number;
-  set: CreateWorkoutSetPayload;
+  set: LocalWorkoutSet;
   setIndex: number;
   theme: string;
 }
@@ -83,6 +81,9 @@ const SetDisplay = ({
   setIndex,
   theme,
 }: Props) => {
+
+  const {ref, handleRef} = useSortable({id:set.id, index:setIndex});
+
   const updateSetReps = (
     exIndex: number,
     setIndex: number,
@@ -93,7 +94,7 @@ const SetDisplay = ({
 
     if (!newExercises[exIndex]) return;
     const oldEx = newExercises[exIndex];
-    const newEx: CreateWorkoutExercisePayload = {
+    const newEx: LocalWorkoutExercise = {
       ...oldEx,
       workoutSets: [...oldEx.workoutSets],
     };
@@ -113,7 +114,7 @@ const SetDisplay = ({
 
     if (!newExercises[exIndex]) return;
     const oldEx = newExercises[exIndex];
-    const newEx: CreateWorkoutExercisePayload = {
+    const newEx: LocalWorkoutExercise = {
       ...oldEx,
       workoutSets: [...oldEx.workoutSets],
     };
@@ -129,7 +130,7 @@ const SetDisplay = ({
     const newExercises = [...workoutExercises];
     if (!newExercises[exIndex]) return;
 
-    const newEx: CreateWorkoutExercisePayload = {
+    const newEx: LocalWorkoutExercise = {
       ...newExercises[exIndex],
       workoutSets: newExercises[exIndex].workoutSets.filter(
         (_, index) => index != setIndex,
@@ -140,9 +141,38 @@ const SetDisplay = ({
     setWorkoutExercises(newExercises);
   };
 
+  // Move sets up/down by one
+  const handleSetMove = (direction:"up" | "down", setIndex:number) => {
+
+    // Edge cases
+    if ((direction === "up") && (setIndex === 0)) return; 
+    if ((direction === "down") && (setIndex === workoutExercises[exIndex].workoutSets.length - 1)) return;
+
+    setWorkoutExercises((prev) => {
+      const newExercises = [...prev]
+      const newEx = { ...newExercises[exIndex] };
+      const newSets = [...newEx.workoutSets];
+      
+      // Swap with previous element
+      if (direction === "up") {
+        [newSets[setIndex], newSets[setIndex-1]] = [newSets[setIndex-1], newSets[setIndex]];
+      }
+      // Swap with next element
+      else {
+        [newSets[setIndex], newSets[setIndex+1]] = [newSets[setIndex+1], newSets[setIndex]];
+      }
+
+      newEx.workoutSets = newSets;
+      newExercises[exIndex] = newEx;
+      return newExercises;
+    })
+  }
+
   return (
     <Card
+      ref={ref}
       key={setIndex}
+      style={{touchAction: "none" }}
       className={`mt-2 ${
         theme === "light"
           ? "bg-body-secondary text-dark"
@@ -150,7 +180,22 @@ const SetDisplay = ({
       }`}
     >
       <Card.Body>
-        <Card.Title> Set {setIndex + 1} </Card.Title>
+        <Card.Title className="d-flex justify-content-between"> 
+          <span>
+            Set {setIndex + 1} 
+          </span>
+          <div className="d-flex">
+            {/* Move up button */}
+            <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleSetMove("up", setIndex)}> <ArrowUp /> </Button>
+            {/* Move down button */}
+            <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleSetMove("down", setIndex)}> <ArrowDown /> </Button>
+            {/* Drag Handle */}
+            <div ref={handleRef} style={{ cursor: "grab", touchAction: "none" }} className="p-2">
+              <GripHorizontal size={20} />
+            </div>
+          </div>
+          </Card.Title>
+
         <div className="d-flex align-items-center gap-3">
           <Col>
             <Row>
