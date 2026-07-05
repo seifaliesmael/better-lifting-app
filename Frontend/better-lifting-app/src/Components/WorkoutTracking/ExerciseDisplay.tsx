@@ -103,6 +103,7 @@ export const ExerciseDisplay = ({
     }
   };
 
+
   return (
     <Card
       key={ex.id} 
@@ -122,9 +123,9 @@ export const ExerciseDisplay = ({
         <div className="d-flex">
           
           {/* Move up button */}
-          <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleExMove("up", exIndex)}> <ArrowUp /> </Button>
+          <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleExMove("up", exIndex)}> <ArrowUp /> </Button>
           {/* Move down button */}
-          <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleExMove("down", exIndex)}> <ArrowDown /> </Button>
+          <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleExMove("down", exIndex)}> <ArrowDown /> </Button>
           {/* Drag Handle */}
           <div ref={handleRef} style={{ cursor: "grab", touchAction: "none" }} className="p-2">
             <GripVertical size={20} />

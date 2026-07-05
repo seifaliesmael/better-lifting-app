@@ -186,9 +186,9 @@ const SetDisplay = ({
           </span>
           <div className="d-flex">
             {/* Move up button */}
-            <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleSetMove("up", setIndex)}> <ArrowUp /> </Button>
+            <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleSetMove("up", setIndex)}> <ArrowUp /> </Button>
             {/* Move down button */}
-            <Button style={{background:"none",borderStyle:"none", color:"black"}} onClick={() => handleSetMove("down", setIndex)}> <ArrowDown /> </Button>
+            <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleSetMove("down", setIndex)}> <ArrowDown /> </Button>
             {/* Drag Handle */}
             <div ref={handleRef} style={{ cursor: "grab", touchAction: "none" }} className="p-2">
               <GripHorizontal size={20} />
