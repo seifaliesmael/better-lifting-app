@@ -1,21 +1,9 @@
-import { useQuery } from '@tanstack/react-query';
-import { ListRender } from '../../Components/Rendering';
+import { ListRender } from '../../Components/Display/ListRenderer';
 import { Card } from 'react-bootstrap';
-import type { MuscleGroup } from '../../Components/Interfaces';
-
-
-const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
-  const response = await fetch('http://localhost:5240/api/musclegroups');
-  if (!response.ok) throw new Error('Network error');
-  return response.json();
-};
+import { fetchAllMuscleGroups } from '../../api/dataServices';
 
 const MuscleList = () => {
-  const { data, isLoading, error } = useQuery({
-    queryKey: ['fetchMuscleGroups'],
-    queryFn: fetchAllMuscleGroups,
-    retry: false
-  });
+  const { data, isLoading, error } = fetchAllMuscleGroups();
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;

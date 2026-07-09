@@ -17,11 +17,12 @@ namespace BetterLiftingApp.Controllers
             context = _context;
         }
 
-        [HttpGet]
-        public async Task<ActionResult<List<WorkoutResponse>>> GetAllWorkouts()
+        // Get all workouts for a user
+        [HttpGet("user/{userid}")]
+        public async Task<ActionResult<List<WorkoutResponse>>> GetAllWorkouts(int userid)
         {
             Console.WriteLine("Received a get all request at Workouts");
-            List<WorkoutResponse> wks = await context.Workouts.Select(w => new WorkoutResponse
+            List<WorkoutResponse> wks = await context.Workouts.Where(w => w.UserId == userid).Select(w => new WorkoutResponse
             {
                 Id = w.Id,
                 Name = w.Name,
@@ -42,13 +43,14 @@ namespace BetterLiftingApp.Controllers
                         Weight = set.Weight,
                         Reps = set.Reps,
                         Type = (DTOs.Response.SetType) set.Type,
-                        RPE = set.RPE
+                        RIR = set.RIR
                     }).ToList()
                 }).ToList()
             }).ToListAsync();
             return Ok(wks);
         }
 
+        // Get a specific workout
         [HttpGet("{id}")]
         public async Task<ActionResult<WorkoutResponse>> GetWorkout(int id)
         {
@@ -76,7 +78,7 @@ namespace BetterLiftingApp.Controllers
                         Weight = set.Weight,
                         Reps = set.Reps,
                         Type = (DTOs.Response.SetType) set.Type,
-                        RPE = set.RPE
+                        RIR = set.RIR
                     }).ToList()
                 }).ToList()
             })
@@ -88,7 +90,7 @@ namespace BetterLiftingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Workout>> AddWorkout(WorkoutPayload payload)
+        public async Task<ActionResult<WorkoutPayload>> AddWorkout(WorkoutPayload payload)
         {
             Console.WriteLine("Received a workout create request with body:");
             Console.WriteLine(JsonSerializer.Serialize(payload));
@@ -110,7 +112,7 @@ namespace BetterLiftingApp.Controllers
                         Weight = set.Weight,
                         Reps = set.Reps,
                         Type = (Models.SetType) set.Type,
-                        RPE = set.Rpe
+                        RIR = set.RIR
                     }).ToList()
                 }).ToList()
             };
@@ -139,7 +141,7 @@ namespace BetterLiftingApp.Controllers
                         Weight = set.Weight,
                         Reps = set.Reps,
                         Type = (DTOs.Response.SetType)set.Type,
-                        RPE = set.RPE
+                        RIR = set.RIR
                     }).ToList()
                 }).ToList()
             };
@@ -170,6 +172,6 @@ namespace BetterLiftingApp.Controllers
         public int Weight { get; set; }
         public int Reps {get; set;}
         public int Type {get; set;}
-        public int? Rpe {get; set;}
+        public int? RIR {get; set;}
     }
 }

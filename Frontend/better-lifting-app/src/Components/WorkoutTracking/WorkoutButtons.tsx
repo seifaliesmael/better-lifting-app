@@ -1,13 +1,13 @@
 import { Button, Dropdown } from "react-bootstrap";
-import type { Exercise } from "../Interfaces";
 import { exerciseReady } from "../../Utilities/workoutUtils";
-import type { CreateWorkoutPayload } from "../CreatePayloads";
-import { createWorkout } from "../../api/workoutServices";
-import type { LocalWorkoutExercise } from "../../Pages/Create/CreateWorkout";
+import { createWorkout } from "../../api/dataServices";
+import type { LocalWorkoutExercise } from "../../Data/LocalData";
+import type { WORequest } from "../../Data/Requests";
+import type { ExResponse } from "../../Data/Responses";
 
 interface AddExerciseProps {
-  data: Exercise[] | undefined;
-  addExercise: (ex: Exercise) => void;
+  data: ExResponse[] | undefined;
+  addExercise: (ex: ExResponse) => void;
 }
 
 // Add a new exercise to a workout
@@ -45,7 +45,7 @@ export const SaveWorkoutButton = ({
 }: SaveWorkoutProps) => {
   // Function to push workout to DB and reset fields
   const pushPayload = async (exercises: LocalWorkoutExercise[]) => {
-    const payload: CreateWorkoutPayload = {
+    const payload: WORequest = {
       userID: 1,
       name: workoutName
         ? workoutName

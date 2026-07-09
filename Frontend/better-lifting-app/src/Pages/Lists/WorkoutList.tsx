@@ -1,25 +1,15 @@
-import type { Workout } from "../../Components/Interfaces";
-import { useQuery } from "@tanstack/react-query";
-import { ListRender } from "../../Components/Rendering";
-import { Card, Row, Col, Button, Modal } from "react-bootstrap";
+import type { WOResponse } from "../../Data/Responses";
+import { ListRender } from "../../Components/Display/ListRenderer";
+import { Card, Row, Col, Button } from "react-bootstrap";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../../contexts/theme/ThemeContext";
-
-const fetchAllWorkouts = async (): Promise<Workout[]> => {
-  const response = await fetch("http://localhost:5240/api/workouts");
-  if (!response.ok) throw new Error("Network error");
-  return response.json();
-};
+import WorkoutDisplay from "../../Components/Display/WorkoutDisplay";
+import { fetchAllWorkouts } from "../../api/dataServices";
 
 const WorkoutList = () => {
-  const workoutListResponse = useQuery({
-    queryKey: ["fetchAllWorkouts"],
-    queryFn: fetchAllWorkouts,
-    retry: false,
-  });
-
+  const workoutListResponse = fetchAllWorkouts(1);
   const [showWorkout, setShowWorkout] = useState<boolean>(false);
-  const [currWorkout, setCurrWorkout] = useState<Workout | undefined>(
+  const [currWorkout, setCurrWorkout] = useState<WOResponse | undefined>(
     undefined,
   );
   const { theme } = useContext(ThemeContext);
@@ -32,67 +22,10 @@ const WorkoutList = () => {
   const handleShow = () => {
     setShowWorkout(true);
   };
-  const handleClose = () => {
-    setShowWorkout(false);
-  };
 
-  const workoutDisplay = (
-    <Modal
-      show={showWorkout}
-      onHide={handleClose}
-      data-bs-theme={theme}
-      contentClassName={
-        theme === "light" ? "bg-white text-dark" : "bg-dark-subtle text-white"
-      }
-    >
-      <Modal.Header closeButton>
-        <Modal.Title> {currWorkout?.name} </Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {currWorkout?.notes ? (
-          <Card className="mb-4">
-            <Card.Body>
-              <Card.Subtitle className="fw-bold"> Notes </Card.Subtitle>
-              <Card.Text> {currWorkout?.notes} </Card.Text>
-            </Card.Body>
-          </Card>
-        ) : (
-          ""
-        )}
-
-        {currWorkout?.workoutExercises.map((we, exIndex) => (
-          <div key={exIndex} className={exIndex != 0 ? "mt-4" : ""}>
-            <h5> {we.name}</h5>
-            {we.workoutSets.map((set, setIndex) => (
-              <Card key={setIndex} className="mt-2 ms-3">
-                <Card.Body style={{ padding: "10px" }}>
-                  <Card.Title style={{ fontSize: "1rem" }}>
-                    Set {setIndex + 1}
-                  </Card.Title>
-                  <Row>
-                    <Col>
-                      <Card.Text> Reps: {set.reps} </Card.Text>
-                    </Col>
-                    <Col>
-                      <Card.Text> Weight: {set.weight} kg </Card.Text>
-                    </Col>
-                  </Row>
-                </Card.Body>
-              </Card>
-            ))}
-          </div>
-        ))}
-      </Modal.Body>
-      <Modal.Footer>
-        <Button variant="secondary" onClick={handleClose}>
-          Close
-        </Button>
-      </Modal.Footer>
-    </Modal>
-  );
   return (
     <>
-      {workoutDisplay}
+      <WorkoutDisplay showWorkout={showWorkout} setShowWorkout={setShowWorkout} theme={theme} currWorkout={currWorkout}/>
       <ListRender
         data={workoutListResponse.data}
         title="Workouts"

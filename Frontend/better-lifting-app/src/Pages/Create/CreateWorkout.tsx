@@ -1,6 +1,4 @@
 import { useContext, useState } from "react";
-import type { Exercise } from "../../Components/Interfaces";
-import { useQuery } from "@tanstack/react-query";
 import {
   Container,
   Form,
@@ -8,25 +6,15 @@ import {
   InputGroup,
 } from "react-bootstrap";
 import type {
-  CreateWorkoutExercisePayload,
-  CreateWorkoutSetPayload,
-} from "../../Components/CreatePayloads";
+  ExResponse
+} from "../../Data/Responses";
 import { ThemeContext } from "../../contexts/theme/ThemeContext";
 import { ExerciseDisplay } from "../../Components/WorkoutTracking/ExerciseDisplay";
-import { fetchAllExercises } from "../../api/workoutServices";
+import { fetchAllExercises } from "../../api/dataServices";
 import { AddExerciseButton, SaveWorkoutButton } from "../../Components/WorkoutTracking/WorkoutButtons";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
-
-// adding a temporary unique ID so that it can be made Sortable (for drag and drop)
-export interface LocalWorkoutExercise extends Omit<CreateWorkoutExercisePayload, 'workoutSets'> {
-  id: string; 
-  workoutSets:LocalWorkoutSet[]; // temporarily store localworkoutsets instead of payload sets, so we can add ID to them
-
-}
-export interface LocalWorkoutSet extends CreateWorkoutSetPayload {
-  id:string;
-}
+import type { LocalWorkoutExercise } from "../../Data/LocalData";
 
 const CreateWorkout = () => {
   const { theme } = useContext(ThemeContext);
@@ -38,17 +26,13 @@ const CreateWorkout = () => {
   const [workoutExercises, setWorkoutExercises] = useState<LocalWorkoutExercise[]>([]);
 
   // Fetching all exercises from DB
-  const exResult = useQuery({
-    queryKey: ["fetchExercises"],
-    queryFn: fetchAllExercises,
-    retry: false,
-  });
+  const exResult = fetchAllExercises();
 
   if (exResult.isLoading) return <p> Fetching exercises... </p>;
   if (exResult.error) return <p>Error: {exResult.error.message}</p>;
   if (!exResult.data) return <p> No exercises found in DB. </p>;
 
-  const addExercise = (ex: Exercise): void => {
+  const addExercise = (ex: ExResponse): void => {
     const newWorkoutEx: LocalWorkoutExercise = {
       name: ex.exerciseName,
       order: workoutExercises ? workoutExercises.length : 0,
@@ -66,6 +50,7 @@ const CreateWorkout = () => {
     setStartTime(new Date());
   };
 
+  // Drag and drop exercises
   const handleExDrag = (event:DragEndEvent) => {
       try {setWorkoutExercises((prev) => move(prev, event))}
       catch (err) {console.log("Error in exercise drag and drop:", err)}}
@@ -74,7 +59,6 @@ const CreateWorkout = () => {
     <>
       <Container>
         <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
-        <p> {JSON.stringify(workoutExercises)}</p>
         <p className="text-muted fw-semibold">
           {" "}
           {new Date(startTime).toDateString()}{" "}
@@ -109,7 +93,7 @@ const CreateWorkout = () => {
 
           {/* Drag and drop exercises within a workout */}
           <DragDropProvider onDragEnd={handleExDrag}>
-            <ul className="list">
+            <ul className="list-unstyled">
               {workoutExercises?.map((ex, index) => (
                 <ExerciseDisplay
                   key={ex.id}

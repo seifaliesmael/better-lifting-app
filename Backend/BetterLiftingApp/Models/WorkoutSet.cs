@@ -10,7 +10,7 @@ namespace BetterLiftingApp.Models
         public decimal Weight {get; set;}
         public int Reps {get; set;}
         public SetType Type {get; set;}
-        public int? RPE {get; set;}
+        public int? RIR {get; set;}
     }
 
     public enum SetType {Warmup, RegularSet, DropSet}

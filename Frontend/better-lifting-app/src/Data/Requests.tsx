@@ -1,27 +1,34 @@
-interface CreateWorkoutPayload {
+// For sending data to the backend
+
+export interface ExRequest {
+  exerciseName: string,
+  muscleGroupIDs: number[]
+  equipmentType: number
+}
+
+
+export interface WORequest {
   userID:number;
   name:string;
   notes?:string;
   start:Date;
   end:Date;
-  workoutExercises:CreateWorkoutExercisePayload[];
+  workoutExercises:WOExRequest[];
 }
 
-interface CreateWorkoutExercisePayload {
+export interface WOExRequest {
   id?:string; // Will be removed before sending to DB
   order:number;
   exerciseId:number;
   name?:string; // Will be removed before sending to DB
-  workoutSets:CreateWorkoutSetPayload[];
+  workoutSets:WOSetRequest[];
 }
 
-interface CreateWorkoutSetPayload {
+export interface WOSetRequest {
   id?:string; // Will be removed before sending to DB
   order:number;
   weight:number;
   reps:number;
   type:number;
-  rpe?:number;
+  rir?:number;
 }
-
-export type {CreateWorkoutPayload, CreateWorkoutExercisePayload, CreateWorkoutSetPayload}

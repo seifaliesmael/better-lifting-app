@@ -1,22 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
-import type { Exercise } from '../../Components/Interfaces';
-import { equipmentTypes } from '../../Components/Interfaces';
-import { ListRender } from '../../Components/Rendering';
+import { ListRender } from '../../Components/Display/ListRenderer';
 import { Card } from 'react-bootstrap';
-
-
-const fetchAllExercises = async (): Promise<Exercise[]> => {
-  const response = await fetch('http://localhost:5240/api/exercises');
-  if (!response.ok) throw new Error('Network error');
-  return response.json();
-};
+import { equipmentTypes } from '../../Data/LocalData';
+import { fetchAllExercises } from '../../api/dataServices';
 
 const ExerciseList = () => {
-    const { data, isLoading, error} = useQuery({
-    queryKey: ['fetchExercises'],
-    queryFn: fetchAllExercises,
-    retry: false
-  });
+  const { data, isLoading, error} = fetchAllExercises();
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;

@@ -1,4 +1,4 @@
-import type { LocalWorkoutExercise } from "../Pages/Create/CreateWorkout";
+import type { LocalWorkoutExercise } from "../Data/LocalData";
 
 // Check if an exercise is valid (i.e, at least 1 set, set info is filled for each set.)
 export const exerciseReady = (ex: LocalWorkoutExercise): boolean => {  

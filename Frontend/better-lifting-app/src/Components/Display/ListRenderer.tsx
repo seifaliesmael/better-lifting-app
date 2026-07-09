@@ -1,10 +1,13 @@
 import { Card } from "react-bootstrap";
-import type { DisplayObject } from "./Interfaces";
 import { useContext } from "react";
-import { ThemeContext } from "../contexts/theme/ThemeContext";
+import { ThemeContext } from "../../contexts/theme/ThemeContext";
 import { List, type RowComponentProps } from "react-window";
 
-interface ListRenderProps<T extends DisplayObject> {
+interface DisplayObject {
+  id: number
+}
+
+interface Props<T extends DisplayObject> {
   data: T[];
   title: string;
   onClick?: (item: T) => void;
@@ -51,7 +54,7 @@ export const ListRender = <T extends DisplayObject>({
   rowHeight,
   renderData,
   onClick,
-}: ListRenderProps<T>) => {
+}: Props<T>) => {
   return (
     <div>
       <h1 style={{ textAlign: "center" }}> {title} </h1>

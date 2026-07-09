@@ -2,7 +2,7 @@ import { type Dispatch, type SetStateAction } from "react";
 import { Button, Card, Col, Row } from "react-bootstrap";
 import SetDisplay from "./SetDisplay";
 import { ArrowDown, ArrowUp, GripVertical, Trash } from "react-bootstrap-icons";
-import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Pages/Create/CreateWorkout";
+import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Data/LocalData";
 import { useSortable } from "@dnd-kit/react/sortable";
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
@@ -48,7 +48,7 @@ export const ExerciseDisplay = ({
         order: oldEx.workoutSets.length,
         weight: -1,
         reps: -1,
-        type: -1,
+        type: 1, // Normal set by default 
         id:crypto.randomUUID()
       };
 
@@ -86,12 +86,12 @@ export const ExerciseDisplay = ({
 
   // Drag and drop sets
   const handleSetDrag = (event: DragEndEvent) => {
-    if (event.canceled) return;
+    if (event.canceled) {console.log("Event canceled"); return;};
     try {
       setWorkoutExercises((prev) => {
         const newExercises = [...prev];
         const currentEx = newExercises[exIndex];
-        if (!currentEx) return prev;
+        // if (!currentEx) return prev;
 
         const newSets = move(currentEx.workoutSets, event);
         newExercises[exIndex] = { ...currentEx, workoutSets: newSets };

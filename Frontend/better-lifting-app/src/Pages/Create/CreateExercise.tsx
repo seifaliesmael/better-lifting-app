@@ -1,58 +1,40 @@
-import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { Button, Dropdown } from 'react-bootstrap'
-import { equipmentTypes, type MuscleGroup } from "../../Components/Interfaces";
 import { Check2Square, Square } from 'react-bootstrap-icons';
+import type { MuscleResponse } from '../../Data/Responses';
+import type { ExRequest } from '../../Data/Requests';
+import { equipmentTypes } from '../../Data/LocalData';
+import { fetchAllMuscleGroups } from '../../api/dataServices';
 
-interface SelectedMuscleGroup extends MuscleGroup {
+interface SelectedMuscleGroup extends MuscleResponse {
   selected: boolean,
 }
-
-interface CreateExercisePayload {
-  exerciseName: string,
-  muscleGroupIDs: number[]
-  equipmentType: number
-}
 const CreateExercise = () => {
+  const muscleGroupsResult = fetchAllMuscleGroups();
 
-  // Load Data
-  const fetchAllMuscleGroups = async (): Promise<MuscleGroup[]> => {
-    const response = await fetch('http://localhost:5240/api/musclegroups');
-    if (!response.ok) throw new Error('Network error');
-    return response.json();
-  };
+  if (muscleGroupsResult.isLoading) return <p>Loading...</p>;
+  if (muscleGroupsResult.error) return <p>Error: {muscleGroupsResult.error.message}</p>;
 
-  const muscleGroupsResult = useQuery({
-    queryKey: ['fetchMuscleGroups'],
-    queryFn: fetchAllMuscleGroups,
-    retry: false
-  });
 
   const [exName, setExName] = useState("");
   const [exType, setExType] = useState(-1);
   const [musclesSelected, setMusclesSelected] = useState<number[]>([]);
 
-  const updateMuscleGroups = (id: number) => {
+  const toggleMuscleSelected = (id: number) => {
     setMusclesSelected(prev =>
       prev.includes(id) ? prev.filter(x => x != id)
         : [...prev, id]
     );
   }
 
-
-  if (muscleGroupsResult.isLoading) return <p>Loading...</p>;
-  if (muscleGroupsResult.error) return <p>Error: {muscleGroupsResult.error.message}</p>;
-
-  // End Load Data
-
   const muscleGroupsSelected: SelectedMuscleGroup[] =
-    muscleGroupsResult.data?.map((m: MuscleGroup) =>
+    muscleGroupsResult.data?.map((m: MuscleResponse) =>
       ({ ...m, selected: musclesSelected.includes(m.id) })) || [];
 
-  const activeMuscleGroups: MuscleGroup[] =
+  const activeMuscleGroups: MuscleResponse[] =
     muscleGroupsResult.data?.filter(m => musclesSelected.includes(m.id)) || [];
 
-  const newEx: CreateExercisePayload = ({ exerciseName: exName, muscleGroupIDs: musclesSelected, equipmentType: exType });
+  const newEx: ExRequest = ({ exerciseName: exName, muscleGroupIDs: musclesSelected, equipmentType: exType });
 
   function handleChangeName(e: any) {
     setExName(e.target.value);
@@ -92,7 +74,7 @@ const CreateExercise = () => {
       }}>
         {muscleGroupsSelected.map(
           (m: SelectedMuscleGroup) =>
-            <Dropdown.Item key={m.id} onClick={() => updateMuscleGroups(m.id)}>
+            <Dropdown.Item key={m.id} onClick={() => toggleMuscleSelected(m.id)}>
               {m.selected ? <Check2Square className="me-2" /> : <Square className="me-2" />} {m.name}
             </Dropdown.Item>
         )
@@ -101,7 +83,7 @@ const CreateExercise = () => {
     </Dropdown>
   )
 
-  const postData = async (newEx: CreateExercisePayload) => {
+  const postData = async (newEx: ExRequest) => {
     try {
       const response = await fetch('http://localhost:5240/api/exercises',
         {

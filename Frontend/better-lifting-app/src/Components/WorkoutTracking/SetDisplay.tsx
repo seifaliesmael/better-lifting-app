@@ -10,8 +10,8 @@ import {
 import { ArrowDown, ArrowUp, GripHorizontal, Trash } from "react-bootstrap-icons";
 import { List, type RowComponentProps } from "react-window";
 import type { Dispatch, SetStateAction } from "react";
-import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Pages/Create/CreateWorkout";
 import { useSortable } from "@dnd-kit/react/sortable";
+import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Data/LocalData";
 
 interface Props {
   workoutExercises: LocalWorkoutExercise[];
@@ -30,6 +30,8 @@ interface DropdownRowData {
   setIndex: number;
   updateFn: (exIndex: number, setIndex: number, val: number) => void;
 }
+
+const setTypes = ["Warm-up Set", "Regular Set", "Drop Set"]
 
 // Dropdown item for reps
 const RepRow = ({
@@ -68,6 +70,46 @@ const WeightRow = ({
     >
       {num * 2 + " kg"}
       {/* TODO- change this to times increment. rn default increment of 2kg. */}
+    </Dropdown.Item>
+  );
+};
+
+// Dropdown row for RIR
+const RirRow = ({
+  index,
+  exIndex,
+  setIndex,
+  updateFn,
+  style,
+}: RowComponentProps<DropdownRowData>) => {
+  const num = index + 1;
+  return (
+    <Dropdown.Item
+      className="text-center"
+      style={{ ...style, fontSize: "16px" }}
+      onClick={() => updateFn(exIndex, setIndex, num)}
+    >
+      {num + " RIR"}
+    </Dropdown.Item>
+  );
+};
+
+// Dropdown row for setType
+const SetTypeRow = ({
+  index,
+  exIndex,
+  setIndex,
+  updateFn,
+  style,
+}: RowComponentProps<DropdownRowData>) => {
+  const num = index;
+  return (
+    <Dropdown.Item
+      className="text-center"
+      style={{ ...style, fontSize: "16px" }}
+      onClick={() => updateFn(exIndex, setIndex, num)}
+    >
+      {setTypes[num]}
     </Dropdown.Item>
   );
 };
@@ -123,6 +165,38 @@ const SetDisplay = ({
     newExercises[exIndex] = newEx;
     setWorkoutExercises(newExercises);
   };
+
+  const updateSetRIR = (exIndex: number, setIndex:number, newRIR:number): void => {
+    if (!workoutExercises) return;
+    const newExercises = [...workoutExercises];
+
+    if (!newExercises[exIndex]) return;
+    const oldEx = newExercises[exIndex];
+    const newEx: LocalWorkoutExercise = {
+      ...oldEx,
+      workoutSets: [...oldEx.workoutSets],
+    };
+    newEx.workoutSets[setIndex].rir = newRIR;
+
+    newExercises[exIndex] = newEx;
+    setWorkoutExercises(newExercises);
+  }
+
+  const updateSetType = (exIndex: number, setIndex:number, setType:number): void => {
+    if (!workoutExercises) return;
+    const newExercises = [...workoutExercises];
+
+    if (!newExercises[exIndex]) return;
+    const oldEx = newExercises[exIndex];
+    const newEx: LocalWorkoutExercise = {
+      ...oldEx,
+      workoutSets: [...oldEx.workoutSets],
+    };
+    newEx.workoutSets[setIndex].type = setType;
+
+    newExercises[exIndex] = newEx;
+    setWorkoutExercises(newExercises);
+  }
 
   // Fn for deleting a set
   const deleteSet = (exIndex: number, setIndex: number): void => {
@@ -205,7 +279,7 @@ const SetDisplay = ({
                   <Dropdown.Toggle
                     style={{ maxWidth: 100, minWidth: 100 }}
                     variant="secondary"
-                    id="dropdown-basic"
+                    id="dropdown-reps"
                   >
                     {set.reps == -1
                       ? "Reps"
@@ -248,7 +322,7 @@ const SetDisplay = ({
                   <Dropdown.Toggle
                     style={{ maxWidth: 100, minWidth: 100 }}
                     variant="secondary"
-                    id="dropdown-basic"
+                    id="dropdown-weight"
                   >
                     {set.weight == -1 ? "Weight" : set.weight + " kg"}
                   </Dropdown.Toggle>
@@ -283,6 +357,65 @@ const SetDisplay = ({
                     updateSetWeight(exIndex, setIndex, Number(e.target.value))
                   }
                 />
+              </InputGroup>
+
+              {/* Set Type Selection */}
+              <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle
+                  style={{ maxWidth: 125, minWidth: 125 }}
+                  variant="danger"
+                  id="dropdown-basic"
+                > {setTypes[set.type]}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                    style={{
+                      maxHeight: "150px",
+                      minWidth: "125px",
+                      maxWidth: "125px",
+                      padding: 0,
+                    }}
+                  >
+                    <List
+                      style={{ height: 115, width: "100%" }}
+                      rowComponent={SetTypeRow}
+                      rowCount={3}
+                      rowHeight={35}
+                      rowProps={{ exIndex, setIndex, updateFn: updateSetType }}
+                    />
+                  </Dropdown.Menu>
+              </Dropdown>
+              </InputGroup>
+
+
+              {/* RIR Selection (Optional) */}
+              <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle
+                  style={{ maxWidth: 75, minWidth: 75 }}
+                  variant="danger"
+                  id="dropdown-basic"
+                > {set.rir ? (set.rir + " RIR") : "RIR"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                    style={{
+                      maxHeight: "150px",
+                      minWidth: "75px",
+                      maxWidth: "75px",
+                      padding: 0,
+                    }}
+                  >
+                    <List
+                      style={{ height: 150, width: "100%" }}
+                      rowComponent={RirRow}
+                      rowCount={10}
+                      rowHeight={35}
+                      rowProps={{ exIndex, setIndex, updateFn: updateSetRIR }}
+                    />
+                  </Dropdown.Menu>
+              </Dropdown>
+              <InputGroup.Text className={theme === "light" ? "bg-body-secondary text-dark border-secondary-subtle" : "bg-dark-subtle text-white"}
+              > Optional </InputGroup.Text>
               </InputGroup>
             </Row>
           </Col>
