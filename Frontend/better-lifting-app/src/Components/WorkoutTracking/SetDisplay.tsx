@@ -1,23 +1,27 @@
 import {
   Button,
   Card,
-  Col,
   Dropdown,
   Form,
   InputGroup,
-  Row,
 } from "react-bootstrap";
-import { ArrowDown, ArrowUp, GripHorizontal, Trash } from "react-bootstrap-icons";
+import {
+  ArrowDown,
+  ArrowUp,
+  GripHorizontal,
+  Trash,
+} from "react-bootstrap-icons";
 import { List, type RowComponentProps } from "react-window";
 import type { Dispatch, SetStateAction } from "react";
 import { useSortable } from "@dnd-kit/react/sortable";
-import type { LocalWorkoutExercise, LocalWorkoutSet } from "../../Data/LocalData";
+import type {
+  LocalWorkoutExercise,
+  LocalWorkoutSet,
+} from "../../Data/LocalData";
 
 interface Props {
   workoutExercises: LocalWorkoutExercise[];
-  setWorkoutExercises: Dispatch<
-    SetStateAction<LocalWorkoutExercise[]>
-  >;
+  setWorkoutExercises: Dispatch<SetStateAction<LocalWorkoutExercise[]>>;
   exIndex: number;
   set: LocalWorkoutSet;
   setIndex: number;
@@ -31,7 +35,7 @@ interface DropdownRowData {
   updateFn: (exIndex: number, setIndex: number, val: number) => void;
 }
 
-const setTypes = ["Warm-up Set", "Regular Set", "Drop Set"]
+const setTypes = ["Warm-up Set", "Regular Set", "Drop Set"];
 
 // Dropdown item for reps
 const RepRow = ({
@@ -123,80 +127,31 @@ const SetDisplay = ({
   setIndex,
   theme,
 }: Props) => {
+  const { ref, handleRef } = useSortable({ id: set.id, index: setIndex });
 
-  const {ref, handleRef} = useSortable({id:set.id, index:setIndex});
-
-  const updateSetReps = (
+  // Fn for updating a set -> takes in an updateFn lambda function
+  const updateSet = (
     exIndex: number,
     setIndex: number,
-    newReps: number,
+    updateFn: (prev: LocalWorkoutSet) => LocalWorkoutSet,
   ): void => {
-    if (!workoutExercises) return;
-    const newExercises = [...workoutExercises];
+    setWorkoutExercises((prev) => {
+      const newExercises: LocalWorkoutExercise[] = [...workoutExercises];
+      if (!newExercises[exIndex]) return prev;
 
-    if (!newExercises[exIndex]) return;
-    const oldEx = newExercises[exIndex];
-    const newEx: LocalWorkoutExercise = {
-      ...oldEx,
-      workoutSets: [...oldEx.workoutSets],
-    };
-    newEx.workoutSets[setIndex].reps = newReps;
+      const oldEx: LocalWorkoutExercise = newExercises[exIndex];
 
-    newExercises[exIndex] = newEx;
-    setWorkoutExercises(newExercises);
+      const newEx: LocalWorkoutExercise = {
+        ...oldEx,
+        workoutSets: [...oldEx.workoutSets],
+      };
+
+      newEx.workoutSets[setIndex] = updateFn(newEx.workoutSets[setIndex]);
+      newExercises[exIndex] = newEx;
+
+      return newExercises;
+    });
   };
-
-  const updateSetWeight = (
-    exIndex: number,
-    setIndex: number,
-    newWeight: number,
-  ): void => {
-    if (!workoutExercises) return;
-    const newExercises = [...workoutExercises];
-
-    if (!newExercises[exIndex]) return;
-    const oldEx = newExercises[exIndex];
-    const newEx: LocalWorkoutExercise = {
-      ...oldEx,
-      workoutSets: [...oldEx.workoutSets],
-    };
-    newEx.workoutSets[setIndex].weight = newWeight;
-
-    newExercises[exIndex] = newEx;
-    setWorkoutExercises(newExercises);
-  };
-
-  const updateSetRIR = (exIndex: number, setIndex:number, newRIR:number): void => {
-    if (!workoutExercises) return;
-    const newExercises = [...workoutExercises];
-
-    if (!newExercises[exIndex]) return;
-    const oldEx = newExercises[exIndex];
-    const newEx: LocalWorkoutExercise = {
-      ...oldEx,
-      workoutSets: [...oldEx.workoutSets],
-    };
-    newEx.workoutSets[setIndex].rir = newRIR;
-
-    newExercises[exIndex] = newEx;
-    setWorkoutExercises(newExercises);
-  }
-
-  const updateSetType = (exIndex: number, setIndex:number, setType:number): void => {
-    if (!workoutExercises) return;
-    const newExercises = [...workoutExercises];
-
-    if (!newExercises[exIndex]) return;
-    const oldEx = newExercises[exIndex];
-    const newEx: LocalWorkoutExercise = {
-      ...oldEx,
-      workoutSets: [...oldEx.workoutSets],
-    };
-    newEx.workoutSets[setIndex].type = setType;
-
-    newExercises[exIndex] = newEx;
-    setWorkoutExercises(newExercises);
-  }
 
   // Fn for deleting a set
   const deleteSet = (exIndex: number, setIndex: number): void => {
@@ -216,37 +171,46 @@ const SetDisplay = ({
   };
 
   // Move sets up/down by one
-  const handleSetMove = (direction:"up" | "down", setIndex:number) => {
-
+  const handleSetMove = (direction: "up" | "down", setIndex: number) => {
     // Edge cases
-    if ((direction === "up") && (setIndex === 0)) return; 
-    if ((direction === "down") && (setIndex === workoutExercises[exIndex].workoutSets.length - 1)) return;
+    if (direction === "up" && setIndex === 0) return;
+    if (
+      direction === "down" &&
+      setIndex === workoutExercises[exIndex].workoutSets.length - 1
+    )
+      return;
 
     setWorkoutExercises((prev) => {
-      const newExercises = [...prev]
+      const newExercises = [...prev];
       const newEx = { ...newExercises[exIndex] };
       const newSets = [...newEx.workoutSets];
-      
+
       // Swap with previous element
       if (direction === "up") {
-        [newSets[setIndex], newSets[setIndex-1]] = [newSets[setIndex-1], newSets[setIndex]];
+        [newSets[setIndex], newSets[setIndex - 1]] = [
+          newSets[setIndex - 1],
+          newSets[setIndex],
+        ];
       }
       // Swap with next element
       else {
-        [newSets[setIndex], newSets[setIndex+1]] = [newSets[setIndex+1], newSets[setIndex]];
+        [newSets[setIndex], newSets[setIndex + 1]] = [
+          newSets[setIndex + 1],
+          newSets[setIndex],
+        ];
       }
 
       newEx.workoutSets = newSets;
       newExercises[exIndex] = newEx;
       return newExercises;
-    })
-  }
+    });
+  };
 
   return (
     <Card
       ref={ref}
       key={setIndex}
-      style={{touchAction: "none" }}
+      style={{ touchAction: "none" }}
       className={`mt-2 ${
         theme === "light"
           ? "bg-body-secondary text-dark"
@@ -254,174 +218,252 @@ const SetDisplay = ({
       }`}
     >
       <Card.Body>
-        <Card.Title className="d-flex justify-content-between"> 
-          <span>
-            Set {setIndex + 1} 
-          </span>
+        <Card.Title className="d-flex justify-content-between mb-3">
+          <span>Set {setIndex + 1}</span>
           <div className="d-flex">
             {/* Move up button */}
-            <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleSetMove("up", setIndex)}> <ArrowUp /> </Button>
+            <Button
+              style={{
+                background: "none",
+                borderStyle: "none",
+                color: theme == "light" ? "black" : "white",
+              }}
+              onClick={() => handleSetMove("up", setIndex)}
+            >
+              {" "}
+              <ArrowUp />{" "}
+            </Button>
             {/* Move down button */}
-            <Button style={{background:"none",borderStyle:"none", color:(theme == "light" ? "black" : "white")}} onClick={() => handleSetMove("down", setIndex)}> <ArrowDown /> </Button>
+            <Button
+              style={{
+                background: "none",
+                borderStyle: "none",
+                color: theme == "light" ? "black" : "white",
+              }}
+              onClick={() => handleSetMove("down", setIndex)}
+            >
+              {" "}
+              <ArrowDown />{" "}
+            </Button>
             {/* Drag Handle */}
-            <div ref={handleRef} style={{ cursor: "grab", touchAction: "none" }} className="p-2">
+            <div
+              ref={handleRef}
+              style={{ cursor: "grab", touchAction: "none" }}
+              className="p-2"
+            >
               <GripHorizontal size={20} />
             </div>
           </div>
-          </Card.Title>
+        </Card.Title>
 
-        <div className="d-flex align-items-center gap-3">
-          <Col>
-            <Row>
-              {/* Reps Selection*/}
-              <InputGroup className="w-auto">
-                <Dropdown className="mt-4">
-                  <Dropdown.Toggle
-                    style={{ maxWidth: 100, minWidth: 100 }}
-                    variant="secondary"
-                    id="dropdown-reps"
-                  >
-                    {set.reps == -1
-                      ? "Reps"
-                      : set.reps == 1
-                        ? set.reps + " rep"
-                        : set.reps + " reps"}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu
-                    style={{
-                      maxHeight: "150px",
-                      minWidth: "100px",
-                      maxWidth: "100px",
-                      padding: 0,
+        <div className="d-flex align-items-center justify-content-between gap-3">
+          {/* Inputs */}
+          <div className="d-flex flex-wrap align-items-center gap-3 w-100">
+            {/* Reps Selection*/}
+            <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle
+                  style={{ maxWidth: 100, minWidth: 100 }}
+                  variant="secondary"
+                  id="dropdown-reps"
+                >
+                  {set.reps == -1
+                    ? "Reps"
+                    : set.reps == 1
+                      ? set.reps + " rep"
+                      : set.reps + " reps"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "100px",
+                    maxWidth: "100px",
+                    padding: 0,
+                  }}
+                >
+                  <List
+                    style={{ height: 150, width: "100%" }}
+                    rowComponent={RepRow}
+                    rowCount={1000}
+                    rowHeight={35}
+                    rowProps={{
+                      exIndex,
+                      setIndex,
+                      updateFn: (exIndex, setIndex, val) => {
+                        updateSet(exIndex, setIndex, (prev) => ({
+                          ...prev,
+                          reps: val,
+                        }));
+                      },
                     }}
-                  >
-                    <List
-                      style={{ height: 150, width: "100%" }}
-                      rowComponent={RepRow}
-                      rowCount={1000}
-                      rowHeight={35}
-                      rowProps={{ exIndex, setIndex, updateFn: updateSetReps }}
-                    />
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Form.Control
-                  placeholder=""
-                  type="number"
-                  aria-label="Reps"
-                  style={{ minWidth: 75, maxWidth: 5 }}
-                  value={set.reps == -1 ? "" : set.reps}
-                  onChange={(e) =>
-                    updateSetReps(exIndex, setIndex, Number(e.target.value))
-                  }
-                />
-              </InputGroup>
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+              <Form.Control
+                placeholder=""
+                type="number"
+                aria-label="Reps"
+                style={{ minWidth: 75, maxWidth: 5 }}
+                value={set.reps == -1 ? "" : set.reps}
+                onChange={(e) =>
+                  updateSet(exIndex, setIndex, (s) => ({
+                    ...s,
+                    reps: Number(e.target.value),
+                  }))
+                }
+              />
+            </InputGroup>
 
-              {/* Weight Selection*/}
-              <InputGroup className="w-auto">
-                <Dropdown className="mt-4">
-                  <Dropdown.Toggle
-                    style={{ maxWidth: 100, minWidth: 100 }}
-                    variant="secondary"
-                    id="dropdown-weight"
-                  >
-                    {set.weight == -1 ? "Weight" : set.weight + " kg"}
-                  </Dropdown.Toggle>
-                  <Dropdown.Menu
-                    style={{
-                      maxHeight: "150px",
-                      minWidth: "100px",
-                      maxWidth: "100px",
-                      padding: 0,
+            {/* Weight Selection*/}
+            <InputGroup className="w-auto">
+              <Dropdown className="mt-4">
+                <Dropdown.Toggle
+                  style={{ maxWidth: 100, minWidth: 100 }}
+                  variant="secondary"
+                  id="dropdown-weight"
+                >
+                  {set.weight == -1 ? "Weight" : set.weight + " kg"}
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "100px",
+                    maxWidth: "100px",
+                    padding: 0,
+                  }}
+                >
+                  <List
+                    style={{ height: 150, width: "100%" }}
+                    rowComponent={WeightRow}
+                    rowCount={1000}
+                    rowHeight={35}
+                    rowProps={{
+                      exIndex,
+                      setIndex,
+                      updateFn: (exIndex, setIndex, val) => {
+                        updateSet(exIndex, setIndex, (prev) => ({
+                          ...prev,
+                          weight: val,
+                        }));
+                      },
                     }}
-                  >
-                    <List
-                      style={{ height: 150, width: "100%" }}
-                      rowComponent={WeightRow}
-                      rowCount={1000}
-                      rowHeight={35}
-                      rowProps={{
-                        exIndex,
-                        setIndex,
-                        updateFn: updateSetWeight,
-                      }}
-                    />
-                  </Dropdown.Menu>
-                </Dropdown>
-                <Form.Control
-                  placeholder=""
-                  type="number"
-                  aria-label="Weight"
-                  style={{ minWidth: 75, maxWidth: 75 }}
-                  value={set.weight == -1 ? "" : set.weight}
-                  onChange={(e) =>
-                    updateSetWeight(exIndex, setIndex, Number(e.target.value))
-                  }
-                />
-              </InputGroup>
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+              <Form.Control
+                placeholder=""
+                type="number"
+                aria-label="Weight"
+                style={{ minWidth: 75, maxWidth: 75 }}
+                value={set.weight == -1 ? "" : set.weight}
+                onChange={(e) =>
+                  updateSet(exIndex, setIndex, (prev) => ({
+                    ...prev,
+                    weight: Number(e.target.value),
+                  }))
+                }
+              />
+            </InputGroup>
 
-              {/* Set Type Selection */}
-              <InputGroup className="w-auto">
+            {/* Set Type Selection */}
+            <InputGroup className="w-auto">
               <Dropdown className="mt-4">
                 <Dropdown.Toggle
                   style={{ maxWidth: 125, minWidth: 125 }}
                   variant="danger"
                   id="dropdown-basic"
-                > {setTypes[set.type]}
+                >
+                  {" "}
+                  {setTypes[set.type]}
                 </Dropdown.Toggle>
                 <Dropdown.Menu
-                    style={{
-                      maxHeight: "150px",
-                      minWidth: "125px",
-                      maxWidth: "125px",
-                      padding: 0,
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "125px",
+                    maxWidth: "125px",
+                    padding: 0,
+                  }}
+                >
+                  <List
+                    style={{ height: 115, width: "100%" }}
+                    rowComponent={SetTypeRow}
+                    rowCount={3}
+                    rowHeight={35}
+                    rowProps={{
+                      exIndex,
+                      setIndex,
+                      updateFn: (
+                        exIndex,
+                        setIndex,
+                        val,
+                      ) => {
+                        updateSet(
+                          exIndex,
+                          setIndex,
+                          (prev) => ({ ...prev, type: val })
+                        );
+                      },
                     }}
-                  >
-                    <List
-                      style={{ height: 115, width: "100%" }}
-                      rowComponent={SetTypeRow}
-                      rowCount={3}
-                      rowHeight={35}
-                      rowProps={{ exIndex, setIndex, updateFn: updateSetType }}
-                    />
-                  </Dropdown.Menu>
+                  />
+                </Dropdown.Menu>
               </Dropdown>
-              </InputGroup>
+            </InputGroup>
 
-
-              {/* RIR Selection (Optional) */}
-              <InputGroup className="w-auto">
+            {/* RIR Selection (Optional) */}
+            <InputGroup className="w-auto">
               <Dropdown className="mt-4">
                 <Dropdown.Toggle
                   style={{ maxWidth: 75, minWidth: 75 }}
                   variant="danger"
                   id="dropdown-basic"
-                > {set.rir ? (set.rir + " RIR") : "RIR"}
+                >
+                  {" "}
+                  {set.rir ? set.rir + " RIR" : "RIR"}
                 </Dropdown.Toggle>
                 <Dropdown.Menu
-                    style={{
-                      maxHeight: "150px",
-                      minWidth: "75px",
-                      maxWidth: "75px",
-                      padding: 0,
+                  style={{
+                    maxHeight: "150px",
+                    minWidth: "75px",
+                    maxWidth: "75px",
+                    padding: 0,
+                  }}
+                >
+                  <List
+                    style={{ height: 150, width: "100%" }}
+                    rowComponent={RirRow}
+                    rowCount={10}
+                    rowHeight={35}
+                    rowProps={{
+                      exIndex,
+                      setIndex,
+                      updateFn: (
+                        exIndex,
+                        setIndex,
+                        val,
+                      ) => {
+                        updateSet(
+                          exIndex,
+                          setIndex,
+                          (prev) => ({ ...prev, rir: val })
+                        );
+                      },
                     }}
-                  >
-                    <List
-                      style={{ height: 150, width: "100%" }}
-                      rowComponent={RirRow}
-                      rowCount={10}
-                      rowHeight={35}
-                      rowProps={{ exIndex, setIndex, updateFn: updateSetRIR }}
-                    />
-                  </Dropdown.Menu>
+                  />
+                </Dropdown.Menu>
               </Dropdown>
-              <InputGroup.Text className={theme === "light" ? "bg-body-secondary text-dark border-secondary-subtle" : "bg-dark-subtle text-white"}
-              > Optional </InputGroup.Text>
-              </InputGroup>
-            </Row>
-          </Col>
-
+              <InputGroup.Text
+                className={
+                  theme === "light"
+                    ? "bg-body-secondary text-dark border-secondary-subtle"
+                    : "bg-dark-subtle text-white"
+                }
+              >
+                {" "}
+                Optional{" "}
+              </InputGroup.Text>
+            </InputGroup>
+          </div>
           {/* Delete Button */}
-          <Col className="text-end ">
             <Button
               className="me-4"
               variant="danger"
@@ -429,7 +471,6 @@ const SetDisplay = ({
             >
               <Trash />
             </Button>
-          </Col>
         </div>
       </Card.Body>
     </Card>
