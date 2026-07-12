@@ -15,6 +15,7 @@ import { AddExerciseButton, SaveWorkoutButton } from "../../Components/WorkoutTr
 import { DragDropProvider, type DragEndEvent } from "@dnd-kit/react";
 import { move } from "@dnd-kit/helpers";
 import type { LocalWorkoutExercise } from "../../Data/LocalData";
+import WorkoutTimer from "../../Components/Display/WorkoutTimer";
 
 const CreateWorkout = () => {
   const { theme } = useContext(ThemeContext);
@@ -43,7 +44,6 @@ const CreateWorkout = () => {
     setWorkoutExercises((prev) => [...prev, newWorkoutEx]);
   };
 
-
   const resetFields = () => {
     setWorkoutName("");
     setWorkoutExercises([]);
@@ -58,7 +58,10 @@ const CreateWorkout = () => {
   return (
     <>
       <Container>
-        <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
+        <div className="d-flex align-items-center gap-3">
+          <h1> {workoutName ? workoutName : "Untitled Workout"} </h1>
+          <WorkoutTimer startTime={startTime} theme={theme} />
+        </div>
         <p className="text-muted fw-semibold">
           {" "}
           {new Date(startTime).toDateString()}{" "}

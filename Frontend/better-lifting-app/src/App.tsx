@@ -7,7 +7,6 @@ import WorkoutList from './Pages/Lists/WorkoutList';
 import CreateWorkout from './Pages/Create/CreateWorkout';
 import { ThemeContext } from './contexts/theme/ThemeContext';
 import { Button, Col, Row } from 'react-bootstrap';
-import TestDND from './Pages/TestDND';
 
 function App() {
   const [currView, setCurrView] = useState("Default")
@@ -25,8 +24,6 @@ function App() {
         return <CreateExercise />;
       case 'createWorkout':
         return <CreateWorkout />;
-      case 'testDND':
-        return <TestDND />;
       default:
         return <p> Default View </p>;
     }

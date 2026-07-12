@@ -85,7 +85,7 @@ export const SaveWorkoutButton = ({
       variant="success mt-4 ms-2"
       onClick={() => pushPayload(wkExercises)}
     >
-      Create Workout
+      Finish Workout
     </Button>
   );
 };

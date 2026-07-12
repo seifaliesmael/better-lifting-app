@@ -23,10 +23,7 @@ const Navbar = ({ updateFn }: Props) => {
                     <div className="btn btn-primary" onClick={() => updateFn("createExercise")}> Create New Exercise </div>
                 </div>
                 <div className="col-2">
-                    <div className="btn btn-primary" onClick={() => updateFn("createWorkout")}> Create New Workout </div>
-                </div>
-                <div className="col-2">
-                    <div className="btn btn-primary" onClick={() => updateFn("testDND")}> testDND </div>
+                    <div className="btn btn-primary" onClick={() => updateFn("createWorkout")}> New Workout </div>
                 </div>
 
             </div>

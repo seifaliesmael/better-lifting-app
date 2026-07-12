@@ -4,7 +4,7 @@ import { Check2Square, Square } from 'react-bootstrap-icons';
 import type { MuscleResponse } from '../../Data/Responses';
 import type { ExRequest } from '../../Data/Requests';
 import { equipmentTypes } from '../../Data/LocalData';
-import { fetchAllMuscleGroups } from '../../api/dataServices';
+import { createExercise, fetchAllMuscleGroups } from '../../api/dataServices';
 
 interface SelectedMuscleGroup extends MuscleResponse {
   selected: boolean,
@@ -12,13 +12,13 @@ interface SelectedMuscleGroup extends MuscleResponse {
 const CreateExercise = () => {
   const muscleGroupsResult = fetchAllMuscleGroups();
 
-  if (muscleGroupsResult.isLoading) return <p>Loading...</p>;
-  if (muscleGroupsResult.error) return <p>Error: {muscleGroupsResult.error.message}</p>;
-
-
   const [exName, setExName] = useState("");
   const [exType, setExType] = useState(-1);
   const [musclesSelected, setMusclesSelected] = useState<number[]>([]);
+
+  if (muscleGroupsResult.isLoading) return <p>Loading...</p>;
+  if (muscleGroupsResult.error) return <p>Error: {muscleGroupsResult.error.message}</p>;
+
 
   const toggleMuscleSelected = (id: number) => {
     setMusclesSelected(prev =>
@@ -85,30 +85,17 @@ const CreateExercise = () => {
 
   const postData = async (newEx: ExRequest) => {
     try {
-      const response = await fetch('http://localhost:5240/api/exercises',
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(newEx),
-        }
-      );
-
-      if (!response.ok) throw new Error('Network error');
-      const result = await response.json();
-      console.log("Successfully created:", result)
-
+      const postResult = await createExercise(newEx);
+      console.log("Successfully created:", postResult)
+  
       setExName("");
       setExType(-1);
       setMusclesSelected([]);
-      return result;
+      return postResult;
     }
-
     catch (err) {
-      console.error("Failed to create exercise", err)
+      console.error("Failed to create exercise:", err);
     }
-
   };
 
   const createButton = <Button variant="success" onClick={() => postData(newEx)}> Create Exercise </Button>

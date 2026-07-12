@@ -8,6 +8,10 @@ Accept: application/json
 GET {{root}}/api/musclegroups
 Accept: application/json
 
+### 
+GET {{root}}/api/workouts/user/1
+Accept: application/json
+
 ###
 
 POST {{root}}/api/exercises
