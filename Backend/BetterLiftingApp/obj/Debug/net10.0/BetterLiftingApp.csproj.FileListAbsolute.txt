@@ -157,3 +157,4 @@ C:\Coding\Projects\better-lifting-app\Backend\BetterLiftingApp\obj\Debug\net10.0
 C:\Coding\Projects\better-lifting-app\Backend\BetterLiftingApp\obj\Debug\net10.0\BetterLiftingApp.pdb
 C:\Coding\Projects\better-lifting-app\Backend\BetterLiftingApp\obj\Debug\net10.0\BetterLiftingApp.genruntimeconfig.cache
 C:\Coding\Projects\better-lifting-app\Backend\BetterLiftingApp\obj\Debug\net10.0\ref\BetterLiftingApp.dll
+C:\Coding\Projects\better-lifting-app\Backend\BetterLiftingApp\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll

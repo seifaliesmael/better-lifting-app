@@ -1,4 +1,5 @@
 using BetterLiftingApp.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,7 +11,11 @@ builder.Services.AddControllers();
 
 builder.Services.AddDbContext<LiftingContext>(
     options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-); // DB Context
+); // DB Context for Data
+
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+.AddEntityFrameworkStores<LiftingContext>(); // Add automatic identity and auth services to the db context.
 
 // CORS so Front-end can access data
 builder.Services.AddCors(options =>
@@ -26,6 +31,8 @@ builder.Services.AddCors(options =>
 
 
 var app = builder.Build();
+
+app.MapGroup("/api/auth").MapIdentityApi<IdentityUser>(); // Adds identity endpoints
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
