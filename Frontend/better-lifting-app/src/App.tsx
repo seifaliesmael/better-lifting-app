@@ -1,10 +1,5 @@
 import { useContext, useState } from 'react'
-import CreateExercise from './Pages/Create/CreateExercise';
-import ExerciseList from './Pages/Lists/ExerciseList';
-import MuscleList from './Pages/Lists/MuscleList';
-import Navbar from './Components/Navbar';
-import WorkoutList from './Pages/Lists/WorkoutList';
-import CreateWorkout from './Pages/Create/CreateWorkout';
+import Navbar, { handleNav } from './Components/Navigation';
 import { ThemeContext } from './contexts/theme/ThemeContext';
 import { Button, Col, Row } from 'react-bootstrap';
 
@@ -12,22 +7,7 @@ function App() {
   const [currView, setCurrView] = useState("Default")
   const {theme, toggleTheme} = useContext(ThemeContext);
 
-  const renderBody = () => {
-    switch(currView) {
-      case 'exercises':
-        return <ExerciseList />;
-      case 'musclegroups':
-        return <MuscleList />;
-      case 'workouts':
-          return <WorkoutList />;
-      case 'createExercise':
-        return <CreateExercise />;
-      case 'createWorkout':
-        return <CreateWorkout />;
-      default:
-        return <p> Default View </p>;
-    }
-  }
+  const renderBody = () => handleNav(currView, setCurrView);
 
   return (
     <div data-bs-theme={theme} className={`p-4 min-vh-100 ${theme === "light" ? "bg-body-secondary text-dark" : "bg-dark-subtle text-white"}`}>
@@ -41,7 +21,7 @@ function App() {
         </Col>
       </Row>
 
-      <Navbar updateFn={setCurrView} />
+      <Navbar updateView={setCurrView} />
 
       <div className="container d-flex justify-content-center mt-5">
         {renderBody()}

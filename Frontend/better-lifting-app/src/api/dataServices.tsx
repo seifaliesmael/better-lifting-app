@@ -10,8 +10,7 @@ Fetch Methods
 -----------------------------------------------------------------------
 */
 
-export const fetchAllExercises = () => {
-  return useQuery({
+export const fetchAllExercises = () => useQuery({
     queryKey: ["fetchExercises"],
     queryFn: async (): Promise<ExResponse[]> => {
       const response = await fetch(`${rootURL}/exercises`);
@@ -20,10 +19,8 @@ export const fetchAllExercises = () => {
     },
     retry: false,
   });
-};
 
-export const fetchAllMuscleGroups = () => {
-  return useQuery({
+export const fetchAllMuscleGroups = () => useQuery({
     queryKey: ["fetchMuscleGroups"],
     queryFn: async (): Promise<MuscleResponse[]> => {
       const response = await fetch(`${rootURL}/musclegroups`);
@@ -32,10 +29,8 @@ export const fetchAllMuscleGroups = () => {
     },
     retry: false,
   });
-};
 
-export const fetchAllWorkouts = (userid: number) => {
-  return useQuery({
+export const fetchAllWorkouts = (userid: number) => useQuery({
     queryKey: ["fetchAllWorkouts", userid],
     queryFn: async (): Promise<WOResponse[]> => {
       const response = await fetch(`${rootURL}/workouts/user/${userid}`);
@@ -44,7 +39,6 @@ export const fetchAllWorkouts = (userid: number) => {
     },
     retry: false,
   });
-};
 
 /*
 -----------------------------------------------------------------------
