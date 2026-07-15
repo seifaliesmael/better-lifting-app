@@ -19,7 +19,7 @@ import WorkoutTimer from "../../Components/Display/WorkoutTimer";
 
 const CreateWorkout = () => {
   const { theme } = useContext(ThemeContext);
-
+  
   // States for tracking workout
   const [startTime, setStartTime] = useState(new Date());
   const [notes, setNotes] = useState("");

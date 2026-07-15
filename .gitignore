@@ -1,0 +1,35 @@
+# ==================================
+# .NET Core / C#
+# ==================================
+# Compiled binaries and build artifacts
+bin/
+obj/
+TestResults/
+
+# User-specific configuration files
+*.user
+*.userprefs
+*.suo
+*.ide
+
+# Visual Studio / VS Code folders
+.vs/
+.vscode/
+
+# Environment variables and secrets
+appsettings.Development.json
+*.env
+
+# ==================================
+# Node.js / Frontend (React, etc.)
+# ==================================
+node_modules/
+dist/
+build/
+.npm/
+
+# ==================================
+# OS generated files
+# ==================================
+.DS_Store
+Thumbs.db
