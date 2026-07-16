@@ -30,10 +30,10 @@ export const fetchAllMuscleGroups = () => useQuery({
     retry: false,
   });
 
-export const fetchAllWorkouts = (userid: number) => useQuery({
-    queryKey: ["fetchAllWorkouts", userid],
+export const fetchAllWorkouts = (email:string) => useQuery({
+    queryKey: ["fetchAllWorkouts", email],
     queryFn: async (): Promise<WOResponse[]> => {
-      const response = await fetch(`${rootURL}/workouts/user/${userid}`);
+      const response = await fetch(`${rootURL}/workouts/user`, {credentials:"include"});
       if (!response.ok) throw new Error("Network error");
       return response.json();
     },
@@ -54,6 +54,7 @@ export const createWorkout = async (
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
+    credentials:"include"
   });
   if (!response.ok)
     throw new Error(`Network error, HTTP code ${response.status}`);

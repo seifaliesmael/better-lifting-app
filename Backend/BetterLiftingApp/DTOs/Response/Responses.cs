@@ -1,27 +1,26 @@
 namespace BetterLiftingApp.DTOs.Response
 {
-    public class WorkoutResponse
+    public class WOResponse
     {
         public int Id { get; set; }
         public string Name { get; set; } = null!;
-        public int UserId { get; set; }
         public string? Notes { get; set; }
         public DateTime Start { get; set; }
         public DateTime End { get; set; }
 
-        public List<WorkoutExerciseResponse> WorkoutExercises { get; set; } = [];
+        public List<WOExResponse> WorkoutExercises { get; set; } = [];
     }
 
-    public class WorkoutExerciseResponse
+    public class WOExResponse
     {
         public int Id { get; set; }
         public string? Name {get; set;} = null!;
         public int Order { get; set; }
         public int ExerciseId { get; set; }
         
-        public List<WorkoutSetResponse> WorkoutSets { get; set; } = [];
+        public List<WOSetResponse> WorkoutSets { get; set; } = [];
     }
-    public class WorkoutSetResponse
+    public class WOSetResponse
     {
         public int Id { get; set; }
         public int Order { get; set; }

@@ -17,7 +17,6 @@ export interface MuscleResponse {
 // Workout response types
 export interface WOResponse {
   id:number;
-  userID:number;
   name:string;
   notes?:string;
   start:Date;

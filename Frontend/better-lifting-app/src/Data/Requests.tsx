@@ -8,7 +8,6 @@ export interface ExRequest {
 
 
 export interface WORequest {
-  userID:number;
   name:string;
   notes?:string;
   start:Date;

@@ -17,11 +17,15 @@ import { move } from "@dnd-kit/helpers";
 import type { LocalWorkoutExercise } from "../../Data/LocalData";
 import WorkoutTimer from "../../Components/Display/WorkoutTimer";
 
-const CreateWorkout = () => {
+interface Props {
+  updateView: (page:string) => void;
+}
+
+const CreateWorkout = ({updateView} : Props) => {
   const { theme } = useContext(ThemeContext);
   
   // States for tracking workout
-  const [startTime, setStartTime] = useState(new Date());
+  const [startTime, _] = useState(new Date());
   const [notes, setNotes] = useState("");
   const [workoutName, setWorkoutName] = useState("");
   const [workoutExercises, setWorkoutExercises] = useState<LocalWorkoutExercise[]>([]);
@@ -45,9 +49,11 @@ const CreateWorkout = () => {
   };
 
   const resetFields = () => {
-    setWorkoutName("");
-    setWorkoutExercises([]);
-    setStartTime(new Date());
+    // setWorkoutName("");
+    // setNotes("");
+    // setWorkoutExercises([]);
+    // setStartTime(new Date());
+    updateView("default");
   };
 
   // Drag and drop exercises

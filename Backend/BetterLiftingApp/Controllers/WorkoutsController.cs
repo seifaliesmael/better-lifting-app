@@ -1,9 +1,13 @@
 using System.Text.Json;
 using BetterLiftingApp.Data;
 using BetterLiftingApp.DTOs.Response;
+using BetterLiftingApp.DTOs.Request;
 using BetterLiftingApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+
+using System.Security.Claims;
 
 namespace BetterLiftingApp.Controllers
 {
@@ -18,25 +22,30 @@ namespace BetterLiftingApp.Controllers
         }
 
         // Get all workouts for a user
-        [HttpGet("user/{userid}")]
-        public async Task<ActionResult<List<WorkoutResponse>>> GetAllWorkouts(int userid)
+        [HttpGet("user")]
+        [Authorize]
+        public async Task<ActionResult<List<WOResponse>>> GetAllWorkouts()
         {
             Console.WriteLine("Received a get all request at Workouts");
-            List<WorkoutResponse> wks = await context.Workouts.Where(w => w.UserId == userid).Select(w => new WorkoutResponse
+            string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userid == null || userid == "") return Unauthorized("User ID not found.");
+
+            Console.WriteLine("User ID received: " + userid);
+            
+            List<WOResponse> wks = await context.Workouts.Where(w => w.UserId == userid).Select(w => new WOResponse
             {
                 Id = w.Id,
                 Name = w.Name,
-                UserId = w.UserId,
                 Notes = w.Notes,
                 Start = w.Start,
                 End = w.End,
-                WorkoutExercises = w.WorkoutExercises.Select(ex => new WorkoutExerciseResponse
+                WorkoutExercises = w.WorkoutExercises.Select(ex => new WOExResponse
                 {
                     Id = ex.Id,
                     Order = ex.Order,
                     ExerciseId = ex.ExerciseId,
                     Name = ex.Exercise.ExerciseName,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WorkoutSetResponse
+                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
                     {
                         Id = set.Id,
                         Order = set.Order,
@@ -52,26 +61,25 @@ namespace BetterLiftingApp.Controllers
 
         // Get a specific workout
         [HttpGet("{id}")]
-        public async Task<ActionResult<WorkoutResponse>> GetWorkout(int id)
+        public async Task<ActionResult<WOResponse>> GetWorkout(int id)
         {
             Console.WriteLine($"Received a get request for id: {id}");
-            WorkoutResponse? wk = await context.Workouts
+            WOResponse? wk = await context.Workouts
             .Where(w => w.Id == id)
-            .Select(w => new WorkoutResponse
+            .Select(w => new WOResponse
             {
                 Id = w.Id,
                 Name = w.Name,
-                UserId = w.UserId,
                 Notes = w.Notes,
                 Start = w.Start,
                 End = w.End,
-                WorkoutExercises = w.WorkoutExercises.Select(ex => new WorkoutExerciseResponse
+                WorkoutExercises = w.WorkoutExercises.Select(ex => new WOExResponse
                 {
                     Id = ex.Id,
                     Order = ex.Order,
                     ExerciseId = ex.ExerciseId,
                     Name = ex.Exercise.ExerciseName,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WorkoutSetResponse
+                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
                     {
                         Id = set.Id,
                         Order = set.Order,
@@ -90,15 +98,19 @@ namespace BetterLiftingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<WorkoutPayload>> AddWorkout(WorkoutPayload payload)
+        [Authorize]
+        public async Task<ActionResult<WORequest>> AddWorkout(WORequest payload)
         {
             Console.WriteLine("Received a workout create request with body:");
             Console.WriteLine(JsonSerializer.Serialize(payload));
 
+            string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userid == null || userid == "") return Unauthorized("User ID not found.");
+
             Workout wk = new Workout
             {
                 Name = payload.Name,
-                UserId = payload.UserId,
+                UserId = userid,
                 Notes = payload.Notes,
                 Start = payload.Start,
                 End = payload.End,
@@ -121,20 +133,19 @@ namespace BetterLiftingApp.Controllers
             await context.SaveChangesAsync();
 
             // TODO : Make a function for this casting
-            WorkoutResponse response = new WorkoutResponse
+            WOResponse response = new WOResponse
             {
                 Id = wk.Id,
                 Name = wk.Name,
-                UserId = wk.UserId,
                 Notes = wk.Notes,
                 Start = wk.Start,
                 End = wk.End,
-                WorkoutExercises = wk.WorkoutExercises.Select(ex => new WorkoutExerciseResponse
+                WorkoutExercises = wk.WorkoutExercises.Select(ex => new WOExResponse
                 {
                     Id = ex.Id,
                     Order = ex.Order,
                     ExerciseId = ex.ExerciseId,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WorkoutSetResponse
+                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
                     {
                         Id = set.Id,
                         Order = set.Order,
@@ -148,30 +159,5 @@ namespace BetterLiftingApp.Controllers
 
             return CreatedAtAction(nameof(GetWorkout), new {id = wk.Id}, response);
         }
-    }
-
-    public class WorkoutPayload
-    {
-        public int UserId {get; set;}
-        public string Name {get; set;} = null!;
-        public string? Notes {get; set;}
-        public DateTime Start {get; set;}
-        public DateTime End {get; set;}
-        public List<WorkoutExercisePayload> WorkoutExercises {get; set;} = [];
-    }
-
-    public class WorkoutExercisePayload
-    {
-        public int Order {get; set;}
-        public int ExerciseId {get; set;}
-        public List<WorkoutSetPayload> WorkoutSets {get; set;} = [];
-    }
-    public class WorkoutSetPayload
-    {
-        public int Order {get; set;}
-        public int Weight { get; set; }
-        public int Reps {get; set;}
-        public int Type {get; set;}
-        public int? RIR {get; set;}
     }
 }

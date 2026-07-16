@@ -6,56 +6,83 @@ import MuscleList from "../Pages/Lists/MuscleList";
 import WorkoutList from "../Pages/Lists/WorkoutList";
 import LoginPage from "../Pages/Auth/LoginPage";
 import RegisterPage from "../Pages/Auth/RegisterPage";
+import { attemptLogout, checkLoggedIn } from "../api/authServices";
 
 interface Props {
-    updateView: (page: string) => void;
+  updateView: (page: string) => void;
 }
 
 interface NavButtonProps {
-    text: string;
-    navTarget:string;
+  text: string;
+  navTarget: string;
 }
 
 const Navbar = ({ updateView }: Props) => {
-    const NavButton = ({text, navTarget}:NavButtonProps) => (
-        <Col>
-            <Button variant="primary" onClick={() => updateView(navTarget)}> {text} </Button>
-        </Col>
-    );
-    return (
-        <Container>
-            <Row>
-                <NavButton text="View Exercises" navTarget="exercisesPage" />
-                <NavButton text="View Muscle Groups" navTarget="musclegroupsPage" />
-                <NavButton text="View Workouts" navTarget="workoutsPage" />
-                <NavButton navTarget="createExercisePage" text="Create New Exercise" />
-                <NavButton navTarget="createWorkoutPage" text="New Workout" />
-                <NavButton text="Login" navTarget="loginPage"/>
-                <NavButton text="Register" navTarget="registerPage"/>
-            </Row>
-        </Container>
-    )
-}
+  const NavButton = ({ text, navTarget }: NavButtonProps) => (
+    <Col>
+      <Button variant="primary" onClick={() => updateView(navTarget)}>
+        {" "}
+        {text}{" "}
+      </Button>
+    </Col>
+  );
 
-export const handleNav = (route:string, updateView:(page:string) => void) => {
-    switch(route) {
-      case 'exercisesPage':
-        return <ExerciseList />;
-      case 'musclegroupsPage':
-        return <MuscleList />;
-      case 'workoutsPage':
-          return <WorkoutList />;
-      case 'createExercisePage':
-        return <CreateExercise />;
-      case 'createWorkoutPage':
-        return <CreateWorkout />;
-      case 'loginPage':
-        return <LoginPage updateView={(page:string) => updateView(page)} />;
-      case 'registerPage':
-        return <RegisterPage updateView={(page:string) => updateView(page)} />;
-      default:
-        return <p> Default View </p>;
-    }
-} 
+  const authResponse = checkLoggedIn();
+  if (authResponse.data) console.log("User is logged in: " + authResponse.data.email);
+  const {mutate} = attemptLogout();
 
-export default Navbar
+  const handleLogout = () => mutate({updateView});
+  return (
+    <Container>
+      <Row>
+        <NavButton text="View Exercises" navTarget="exercisesPage" />
+        <NavButton text="View Muscle Groups" navTarget="musclegroupsPage" />
+        <NavButton text="View Workouts" navTarget="workoutsPage" />
+        <NavButton navTarget="createExercisePage" text="Create New Exercise" />
+        <NavButton navTarget="createWorkoutPage" text="New Workout" />
+        {authResponse.data ? (
+          <Col>
+            <Button
+              variant="primary"
+              onClick={() => {
+                handleLogout();
+              }}
+            >
+              {" "}
+              Log Out{" "}
+            </Button>
+          </Col>
+        ) : <>
+          <NavButton text="Login" navTarget="loginPage" />
+          <NavButton text="Register" navTarget="registerPage" />
+        </>}
+      </Row>
+    </Container>
+  );
+};
+
+export const handleNav = (
+  route: string,
+  updateView: (page: string) => void,
+) => {
+  switch (route) {
+    case "exercisesPage":
+      return <ExerciseList />;
+    case "musclegroupsPage":
+      return <MuscleList />;
+    case "workoutsPage":
+      return <WorkoutList />;
+    case "createExercisePage":
+      return <CreateExercise />;
+    case "createWorkoutPage":
+      return <CreateWorkout updateView={(page: string) => updateView(page)} />;
+    case "loginPage":
+      return <LoginPage updateView={(page: string) => updateView(page)} />;
+    case "registerPage":
+      return <RegisterPage updateView={(page: string) => updateView(page)} />;
+    default:
+      return <p> Default View </p>;
+  }
+};
+
+export default Navbar;

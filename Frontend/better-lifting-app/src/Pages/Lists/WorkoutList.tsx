@@ -5,9 +5,13 @@ import { useContext, useState } from "react";
 import { ThemeContext } from "../../contexts/theme/ThemeContext";
 import WorkoutDisplay from "../../Components/Display/WorkoutDisplay";
 import { fetchAllWorkouts } from "../../api/dataServices";
+import { checkLoggedIn } from "../../api/authServices";
 
 const WorkoutList = () => {
-  const workoutListResponse = fetchAllWorkouts(1);
+  const { data } = checkLoggedIn();
+  if (!data) return <p> Not logged in. </p>
+  
+  const workoutListResponse = fetchAllWorkouts(data?.email);
   const [showWorkout, setShowWorkout] = useState<boolean>(false);
   const [currWorkout, setCurrWorkout] = useState<WOResponse | undefined>(
     undefined,

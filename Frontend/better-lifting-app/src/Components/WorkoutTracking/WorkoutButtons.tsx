@@ -46,7 +46,6 @@ export const SaveWorkoutButton = ({
   // Function to push workout to DB and reset fields
   const pushPayload = async (exercises: LocalWorkoutExercise[]) => {
     const payload: WORequest = {
-      userID: 1,
       name: workoutName
         ? workoutName
         : `Untitled Workout [${startTime.toDateString()}]`,

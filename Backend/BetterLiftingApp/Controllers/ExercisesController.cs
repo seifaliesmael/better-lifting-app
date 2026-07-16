@@ -1,5 +1,6 @@
 using System.Text.Json;
 using BetterLiftingApp.Data;
+using BetterLiftingApp.DTOs.Request;
 using BetterLiftingApp.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,7 +36,7 @@ namespace BetterLiftingApp.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Exercise>> AddExercise(ExerciseCreatePayload newEx)
+        public async Task<ActionResult<Exercise>> AddExercise(ExRequest newEx)
         {
             Console.WriteLine($"Received a post request for new exercise");
             Console.WriteLine(JsonSerializer.Serialize(newEx));
@@ -57,12 +58,5 @@ namespace BetterLiftingApp.Controllers
 
             return CreatedAtAction(nameof(GetExercise), new {id = ex.Id}, ex);
         }
-    }
-
-    public class ExerciseCreatePayload
-    {
-        public string ExerciseName {get; set;} = null!;
-        public List<int> MuscleGroupIDs {get; set;} = new();
-        public Equipment EquipmentType {get; set;}
     }
 }

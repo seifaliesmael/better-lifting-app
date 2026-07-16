@@ -4,7 +4,7 @@ namespace BetterLiftingApp.Models
     {
         public int Id {get; set;}
         public string Name {get; set;} = null!;
-        public int UserId {get; set;}
+        public string UserId {get; set;} = null!;
         public String? Notes {get; set;}
         public DateTime Start {get; set;}
         public DateTime End {get; set;}

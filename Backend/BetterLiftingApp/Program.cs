@@ -14,7 +14,7 @@ builder.Services.AddDbContext<LiftingContext>(
 ); // DB Context for Data
 
 builder.Services.AddAuthorization();
-builder.Services.AddIdentityApiEndpoints<IdentityUser>()
+builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 .AddEntityFrameworkStores<LiftingContext>(); // Add automatic identity and auth services to the db context.
 
 // CORS so Front-end can access data
@@ -25,7 +25,8 @@ builder.Services.AddCors(options =>
     {
         policy.WithOrigins("http://localhost:5173") // TODO: separate front-end port to config
         .AllowAnyHeader()
-        .AllowAnyMethod();
+        .AllowAnyMethod()
+        .AllowCredentials();
     });
 });
 
@@ -34,14 +35,22 @@ var app = builder.Build();
 
 app.MapGroup("/api/auth").MapIdentityApi<IdentityUser>(); // Adds identity endpoints
 
+// Add logout endpoint
+app.MapPost("/api/auth/logout", async (SignInManager<IdentityUser> signInManager) =>
+{
+    await signInManager.SignOutAsync();
+    return Results.Ok();
+}).RequireAuthorization();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); TODO: Add HTTPS back
 
 app.UseCors("AllowLocalDev");
+app.UseAuthorization();
 app.MapControllers();
 app.Run();
