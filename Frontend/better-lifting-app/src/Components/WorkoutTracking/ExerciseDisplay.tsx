@@ -117,7 +117,7 @@ export const ExerciseDisplay = ({
     >
       <Card.Body>
         <Card.Title className="d-flex justify-content-between align-items-center"> 
-        <span> {ex.name} </span>
+        <span> {ex.exerciseName} </span>
 
         {/* Buttons */}
         <div className="d-flex">

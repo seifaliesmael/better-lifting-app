@@ -39,7 +39,7 @@ const CreateWorkout = ({updateView} : Props) => {
 
   const addExercise = (ex: ExResponse): void => {
     const newWorkoutEx: LocalWorkoutExercise = {
-      name: ex.exerciseName,
+      exerciseName: ex.exerciseName,
       order: workoutExercises ? workoutExercises.length : 0,
       exerciseId: ex.id,
       workoutSets: [],

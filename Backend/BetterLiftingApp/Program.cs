@@ -1,6 +1,7 @@
 using BetterLiftingApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 .AddEntityFrameworkStores<LiftingContext>(); // Add automatic identity and auth services to the db context.
 
+builder.Services.AddAutoMapper(typeof(Program));
+
 // CORS so Front-end can access data
 builder.Services.AddCors(options =>
 {
@@ -29,6 +32,7 @@ builder.Services.AddCors(options =>
         .AllowCredentials();
     });
 });
+
 
 
 var app = builder.Build();

@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 using System.Security.Claims;
+using AutoMapper;
+using System.Net.Mail;
 
 namespace BetterLiftingApp.Controllers
 {
@@ -16,9 +18,11 @@ namespace BetterLiftingApp.Controllers
     public class WorkoutsController : ControllerBase
     {
         private readonly LiftingContext context;
-        public WorkoutsController(LiftingContext _context)
+        private readonly IMapper mapper;
+        public WorkoutsController(LiftingContext _context, IMapper _mapper)
         {
             context = _context;
+            mapper = _mapper;
         }
 
         // Get all workouts for a user
@@ -27,136 +31,64 @@ namespace BetterLiftingApp.Controllers
         public async Task<ActionResult<List<WOResponse>>> GetAllWorkouts()
         {
             Console.WriteLine("Received a get all request at Workouts");
+            
+            // Get userid from HttpOnly cookie
             string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userid == null || userid == "") return Unauthorized("User ID not found.");
 
             Console.WriteLine("User ID received: " + userid);
-            
-            List<WOResponse> wks = await context.Workouts.Where(w => w.UserId == userid).Select(w => new WOResponse
-            {
-                Id = w.Id,
-                Name = w.Name,
-                Notes = w.Notes,
-                Start = w.Start,
-                End = w.End,
-                WorkoutExercises = w.WorkoutExercises.Select(ex => new WOExResponse
-                {
-                    Id = ex.Id,
-                    Order = ex.Order,
-                    ExerciseId = ex.ExerciseId,
-                    Name = ex.Exercise.ExerciseName,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
-                    {
-                        Id = set.Id,
-                        Order = set.Order,
-                        Weight = set.Weight,
-                        Reps = set.Reps,
-                        Type = (DTOs.Response.SetType) set.Type,
-                        RIR = set.RIR
-                    }).ToList()
-                }).ToList()
-            }).ToListAsync();
-            return Ok(wks);
+
+            // Find user's DB workouts -> include statements otherwise lazy loading will only give a shallow copy (top level)
+            List<Workout> wks = await context.Workouts.Where(w => w.UserId == userid)
+            .Include(w => w.WorkoutExercises).ThenInclude(we => we.Exercise)
+            .Include(w => w.WorkoutExercises).ThenInclude(we => we.WorkoutSets)
+            .ToListAsync();
+
+            // Convert workouts into response payloads
+            List<WOResponse> response = mapper.Map<List<WOResponse>>(wks);
+            return Ok(response);
         }
 
-        // Get a specific workout
         [HttpGet("{id}")]
         public async Task<ActionResult<WOResponse>> GetWorkout(int id)
         {
             Console.WriteLine($"Received a get request for id: {id}");
-            WOResponse? wk = await context.Workouts
-            .Where(w => w.Id == id)
-            .Select(w => new WOResponse
-            {
-                Id = w.Id,
-                Name = w.Name,
-                Notes = w.Notes,
-                Start = w.Start,
-                End = w.End,
-                WorkoutExercises = w.WorkoutExercises.Select(ex => new WOExResponse
-                {
-                    Id = ex.Id,
-                    Order = ex.Order,
-                    ExerciseId = ex.ExerciseId,
-                    Name = ex.Exercise.ExerciseName,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
-                    {
-                        Id = set.Id,
-                        Order = set.Order,
-                        Weight = set.Weight,
-                        Reps = set.Reps,
-                        Type = (DTOs.Response.SetType) set.Type,
-                        RIR = set.RIR
-                    }).ToList()
-                }).ToList()
-            })
+
+            // Find workout with corresponding ID
+            Workout? wk = await context.Workouts.Where(w => w.Id == id)
+            .Include(w => w.WorkoutExercises).ThenInclude(we => we.Exercise)
+            .Include(w => w.WorkoutExercises).ThenInclude(we => we.WorkoutSets)
             .FirstOrDefaultAsync();
 
-
             if (wk == null) return NotFound();
-            return Ok(wk); 
+
+            // Convert DB workout to response payload
+            WOResponse response = mapper.Map<WOResponse>(wk);
+            return Ok(response); 
         }
 
         [HttpPost]
         [Authorize]
         public async Task<ActionResult<WORequest>> AddWorkout(WORequest payload)
         {
+            // For Debugging
             Console.WriteLine("Received a workout create request with body:");
             Console.WriteLine(JsonSerializer.Serialize(payload));
 
+            // Get userid from HttpOnly cookie
             string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userid == null || userid == "") return Unauthorized("User ID not found.");
 
-            Workout wk = new Workout
-            {
-                Name = payload.Name,
-                UserId = userid,
-                Notes = payload.Notes,
-                Start = payload.Start,
-                End = payload.End,
-                WorkoutExercises = payload.WorkoutExercises.Select(ex => new WorkoutExercise
-                {
-                    Order = ex.Order,
-                    ExerciseId = ex.ExerciseId,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WorkoutSet
-                    {
-                        Order = set.Order,
-                        Weight = set.Weight,
-                        Reps = set.Reps,
-                        Type = (Models.SetType) set.Type,
-                        RIR = set.RIR
-                    }).ToList()
-                }).ToList()
-            };
+            // Convert request payload into DB workout
+            Workout wk = mapper.Map<Workout>(payload);
+            wk.UserId = userid;
 
+            // Save new workout in DB
             context.Workouts.Add(wk);
             await context.SaveChangesAsync();
 
-            // TODO : Make a function for this casting
-            WOResponse response = new WOResponse
-            {
-                Id = wk.Id,
-                Name = wk.Name,
-                Notes = wk.Notes,
-                Start = wk.Start,
-                End = wk.End,
-                WorkoutExercises = wk.WorkoutExercises.Select(ex => new WOExResponse
-                {
-                    Id = ex.Id,
-                    Order = ex.Order,
-                    ExerciseId = ex.ExerciseId,
-                    WorkoutSets = ex.WorkoutSets.Select(set => new WOSetResponse
-                    {
-                        Id = set.Id,
-                        Order = set.Order,
-                        Weight = set.Weight,
-                        Reps = set.Reps,
-                        Type = (DTOs.Response.SetType)set.Type,
-                        RIR = set.RIR
-                    }).ToList()
-                }).ToList()
-            };
-
+            // Convert to response payload to send back to frontend
+            WOResponse response = mapper.Map<WOResponse>(wk);
             return CreatedAtAction(nameof(GetWorkout), new {id = wk.Id}, response);
         }
     }

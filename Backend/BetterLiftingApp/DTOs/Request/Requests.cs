@@ -7,7 +7,7 @@ namespace BetterLiftingApp.DTOs.Request
         public string ExerciseName {get; set;} = null!;
         public List<int> MuscleGroupIDs {get; set;} = new();
         public Equipment EquipmentType {get; set;}
-}
+    }   
 
     public class WORequest
     {

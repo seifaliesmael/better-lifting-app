@@ -19,7 +19,7 @@ export interface WOExRequest {
   id?:string; // Will be removed before sending to DB
   order:number;
   exerciseId:number;
-  name?:string; // Will be removed before sending to DB
+  exerciseName?:string; // Will be removed before sending to DB
   workoutSets:WOSetRequest[];
 }
 

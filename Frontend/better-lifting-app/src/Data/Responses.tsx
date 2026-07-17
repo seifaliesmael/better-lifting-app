@@ -28,7 +28,7 @@ export interface WOExResponse {
   id:number;
   order:number;
   exerciseId:number;
-  name?:string;
+  exerciseName?:string;
   workoutSets:WOSetResponse[];
 }
 

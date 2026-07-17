@@ -1,4 +1,5 @@
 using System.Text.Json;
+using AutoMapper;
 using BetterLiftingApp.Data;
 using BetterLiftingApp.DTOs.Request;
 using BetterLiftingApp.Models;
@@ -12,9 +13,11 @@ namespace BetterLiftingApp.Controllers
     public class ExercisesController : ControllerBase
     {
         private readonly LiftingContext context;
-        public ExercisesController(LiftingContext _context)
+        private readonly IMapper mapper;
+        public ExercisesController (LiftingContext _context, IMapper _mapper)
         {
             context = _context;
+            mapper = _mapper;
         }
 
         [HttpGet]
@@ -42,17 +45,13 @@ namespace BetterLiftingApp.Controllers
             Console.WriteLine(JsonSerializer.Serialize(newEx));
             Console.WriteLine("Muscle groups:" + newEx.MuscleGroupIDs.ToArray().ToString());
 
-
             if (newEx == null) return BadRequest();
 
-            List<MuscleGroup> muscleGroups = await context.MuscleGroups.Where(e => newEx.MuscleGroupIDs.Contains(e.Id)).ToListAsync();
-            
-            Exercise ex = new Exercise
-            {
-                ExerciseName = newEx.ExerciseName,
-                MuscleGroups = muscleGroups,
-                EquipmentType = newEx.EquipmentType
-            };
+            // Convert request payload to DB Exercise (will not map musclegroups automatically)            
+            Exercise ex = mapper.Map<Exercise>(newEx);
+            // Add in the muscle groups
+            ex.MuscleGroups =  await context.MuscleGroups.Where(e => newEx.MuscleGroupIDs.Contains(e.Id)).ToListAsync();
+
             context.Exercises.Add(ex);
             await context.SaveChangesAsync();
 
