@@ -4,9 +4,9 @@ import { equipmentTypes } from '../../Data/LocalData';
 import { fetchAllExercises } from '../../api/dataServices';
 
 const ExerciseList = () => {
-  const { data, isLoading, error} = fetchAllExercises();
+  const { data, isPending, error} = fetchAllExercises();
 
-  if (isLoading) return <p>Loading...</p>;
+  if (isPending) return <p>Loading...</p>;
   if (error) return <p>Error: {error.message}</p>;
   if (!data) return <p>No exercises found</p>;
 

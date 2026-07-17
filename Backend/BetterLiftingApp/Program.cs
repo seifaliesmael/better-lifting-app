@@ -26,7 +26,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalDev",
     policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // TODO: separate front-end port to config
+        policy.WithOrigins("http://localhost:5173", "http://localhost:8081") // TODO: separate front-end port to config
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
