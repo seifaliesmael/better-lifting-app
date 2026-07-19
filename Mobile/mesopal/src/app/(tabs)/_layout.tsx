@@ -29,6 +29,15 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <FontAwesome name="list" size={24} color={color} />
         }} 
       />
+      <Tabs.Screen
+      name="logout"
+      options={{
+        title: 'Logout',
+        href: '/auth/logout', // specify route so it doesnt look for a logout page in the same folder
+        tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />
+      }}
+    />
     </Tabs>
+    
   );
 }

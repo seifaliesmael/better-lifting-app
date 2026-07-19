@@ -41,7 +41,7 @@ const handleClose = () => {setShowWorkout(false)}
 
         {currWorkout?.workoutExercises.map((we, exIndex) => (
           <div key={exIndex} className={exIndex != 0 ? "mt-4" : ""}>
-            <h5> {we.name}</h5>
+            <h5> {we.exerciseName}</h5>
             {we.workoutSets.map((set, setIndex) => (
               <Card key={setIndex} className="mt-2 ms-3">
                 <Card.Body style={{ padding: "10px" }}>

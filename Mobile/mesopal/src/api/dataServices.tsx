@@ -31,7 +31,7 @@ export const fetchAllMuscleGroups = () => useQuery({
     retry: false,
   });
 
-export const fetchAllWorkouts = (email:string) => useQuery({
+export const fetchAllWorkouts = (email:string | undefined) => (!email) ? null : useQuery({
     queryKey: ["fetchAllWorkouts", email],
     queryFn: async (): Promise<WOResponse[]> => {
       const response = await fetch(`${rootURL}/workouts/user`, {credentials:"include"});

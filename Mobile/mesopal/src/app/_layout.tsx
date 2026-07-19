@@ -1,3 +1,4 @@
+import "../global.css"; // For nativewind styling 
 import { Stack } from 'expo-router';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ThemeProvider } from '@/contexts/theme/ThemeContext';
@@ -11,7 +12,7 @@ export default function RootLayout() {
       <ThemeProvider>
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="login" options={{ presentation: 'modal' }} />
+          <Stack.Screen name="auth/login" options={{ presentation: 'modal' }} />
         </Stack>
       </ThemeProvider>
     </QueryClientProvider>

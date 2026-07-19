@@ -1,7 +1,6 @@
 using BetterLiftingApp.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using AutoMapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +31,6 @@ builder.Services.AddCors(options =>
         .AllowCredentials();
     });
 });
-
-
 
 var app = builder.Build();
 

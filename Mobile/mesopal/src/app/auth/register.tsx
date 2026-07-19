@@ -1,0 +1,133 @@
+import { attemptLogin, attemptRegister } from "@/api/authServices";
+import { Card } from "@/components/ui/Card";
+import { ThemeContext } from "@/contexts/theme/ThemeContext";
+import { router } from "expo-router";
+import { useState, useContext } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
+import { RotateInUpLeft } from "react-native-reanimated";
+
+const RegisterPage = () => {
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const { theme } = useContext(ThemeContext);
+  const { mutate, isPending, error, isError } = attemptRegister();
+
+  const isLight = theme === "light";
+  const textColor = isLight ? "text-black" : "text-white";
+  const inputBg = isLight ? "bg-gray-50" : "bg-gray-800";
+  const borderColor = isLight ? "border-gray-300" : "border-gray-600";
+  const mutedText = isLight ? "text-gray-500" : "text-gray-400";
+
+  const getErrors = (field: string): string[] => {
+    if (!isError || !error?.errors) return [];
+
+    return Object.entries(error.errors)
+      .filter(([key]) => key.toLowerCase().includes(field.toLowerCase()))
+      .flatMap(([, messages]) => messages); // fold
+  };
+
+  const emailErrors = [...getErrors("email"), getErrors("username")];
+  const passwordErrors = getErrors("password");
+
+  const handleRegister = () => {
+    if (isPending) console.log("Pending registration attempt");
+    console.log("Registration attempted:", { email, password });
+    mutate({ email, password });
+  };
+
+  const registerButton = (
+    <Pressable
+      className="bg-blue-600 w-full py-3 rounded-lg mt-4 mb-4 active:bg-blue-700"
+      onPress={handleRegister}
+    >
+      <Text className="text-white text-center font-bold text-base">Log In</Text>
+    </Pressable>
+  );
+
+  return (
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 justify-center items-center px-4"
+    >
+      <Card className="w-full max-w-[400px] border-0">
+        <Card.Body className="p-6">
+          <Text className={`text-3xl font-bold text-center mb-6 ${textColor}`}>
+            Register
+          </Text>
+
+          {/* Email Input */}
+          <View className="mb-4">
+            <Text className={`text-sm font-bold mb-2 ${mutedText}`}>
+              Email address
+            </Text>
+            <TextInput
+              className={`border rounded-lg px-4 py-3 ${inputBg} ${borderColor} ${textColor}`}
+              placeholder="name@example.com"
+              placeholderTextColor={isLight ? "#9ca3af" : "#6b7280"}
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+            />
+          </View>
+
+          {/* Email errors */}
+          {emailErrors.map((error, index) => (
+            <View key={index}>
+              <Text className="text-red-500 text-sm mb-4"> {error} </Text>
+            </View>
+          ))}
+
+          {/* Password Input */}
+          <View className="mb-4">
+            <Text className={`text-sm font-bold mb-2 ${mutedText}`}>
+              Password
+            </Text>
+            <TextInput
+              className={`border rounded-lg px-4 py-3 ${inputBg} ${borderColor} ${textColor}`}
+              placeholder="Enter your password"
+              placeholderTextColor={isLight ? "#9ca3af" : "#6b7280"}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+          </View>
+
+          {/* Password errors */}
+          {passwordErrors.map((error, index) => (
+            <View key={index}>
+              <Text  className="text-red-500 text-sm mb-4">{error}</Text>
+            </View>
+          ))}
+
+          {registerButton}
+
+          {/* Footer link */}
+          <View className="flex-row justify-center items-center">
+            <Text className={`text-sm ${mutedText}`}>
+              Already have an account?{" "}
+            </Text>
+            <Pressable
+              onPress={() => {
+                router.replace("./login");
+              }}
+            >
+              <Text className="text-blue-500 text-sm font-semibold">
+                Log in
+              </Text>
+            </Pressable>
+          </View>
+        </Card.Body>
+      </Card>
+    </KeyboardAvoidingView>
+  );
+};
+
+export default RegisterPage;
