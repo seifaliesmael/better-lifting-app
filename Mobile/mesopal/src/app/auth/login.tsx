@@ -1,7 +1,7 @@
-import { attemptLogin } from "@/api/authServices";
+import { useLoginAttempt } from "@/api/authServices";
 import { Card } from "@/components/ui/Card";
 import { ThemeContext } from "@/contexts/theme/ThemeContext";
-import { router } from "expo-router";
+import { router, Stack } from "expo-router";
 import { useState, useContext } from "react";
 import {
   View,
@@ -11,11 +11,12 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { mutate, isPending, isError } = attemptLogin();
+  const { mutate, isPending, isError } = useLoginAttempt();
   const { theme } = useContext(ThemeContext);
 
   const isLight = theme === "light";
@@ -40,10 +41,18 @@ const LoginPage = () => {
   );
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 justify-center items-center px-4"
+    <KeyboardAwareScrollView
+      contentContainerStyle={{ flexGrow: 1, justifyContent: "center", alignItems: "center", paddingHorizontal: 16 }}
+      enableOnAndroid={true}
+      keyboardShouldPersistTaps="handled"
+      extraScrollHeight={20} 
     >
+
+      <Stack.Screen options={{ 
+        title: 'Login', 
+        headerLeft: () => null
+       }} />
+
       <Card className="w-full max-w-[400px] border-0">
         <Card.Body className="p-6">
           <Text className={`text-3xl font-bold text-center mb-6 ${textColor}`}>
@@ -107,7 +116,7 @@ const LoginPage = () => {
           </View>
         </Card.Body>
       </Card>
-    </KeyboardAvoidingView>
+    </KeyboardAwareScrollView>
   );
 };
 

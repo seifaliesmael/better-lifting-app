@@ -17,3 +17,9 @@ export interface AuthErrorResponse {
     errors: Record<string, string[]>;
     traceId?: string;
 }
+
+// returned by .NET when checking if user is logged in
+export interface UserInfo {
+    email: string;
+    isEmailConfirmed: boolean;
+}

@@ -1,4 +1,4 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
 
 // Navbar basically
@@ -31,9 +31,14 @@ export default function TabLayout() {
       />
       <Tabs.Screen
       name="logout"
+        listeners={{
+          tabPress: (e) => {
+            e.preventDefault(); // Avoids being directed to (tabs)/logout.tsx which is blank
+            router.push('/auth/logout');
+          }
+        }}
       options={{
         title: 'Logout',
-        href: '/auth/logout', // specify route so it doesnt look for a logout page in the same folder
         tabBarIcon: ({ color }) => <FontAwesome name="sign-out" size={24} color={color} />
       }}
     />

@@ -4,13 +4,13 @@ import { ActivityIndicator, View, Text } from 'react-native';
 import { useEffect } from 'react';
 
 export default function Index() {
-  const { data, isLoading } = checkLoggedIn();
+  const { data:isLoggedIn, isLoading } = checkLoggedIn();
 
   useEffect(() => {
-    if (!isLoading && !data) {
+    if (!isLoading && !isLoggedIn) {
       router.replace('/auth/login');
     }
-  }, [data, isLoading]);
+  }, [isLoggedIn, isLoading]);
 
   if (isLoading) {
     return (
@@ -20,13 +20,14 @@ export default function Index() {
     );
   }
 
-  if (!data) {
+  if (!isLoggedIn) {
     return null;
   }
 
   return (
-    <View className="flex-1 justify-center items-center p-6">
-      <Text className="text-lg font-semibold">Welcome back</Text>
+    <View className="flex-1 justify-center items-center bg-gray-50">
+      <Text className="text-[28px] font-bold mb-1">MesoPal</Text>
+      <Text className="text-base italic text-gray-500">A better lifting app</Text>
     </View>
   );
 }

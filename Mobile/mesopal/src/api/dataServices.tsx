@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { ExRequest, WORequest } from "../Data/Requests";
 import type { ExResponse, MuscleResponse, WOResponse } from "../Data/Responses";
+import { getLoginToken } from "./authServices";
 
 const rootURL = "http://localhost:5240/api";
 
@@ -31,14 +32,22 @@ export const fetchAllMuscleGroups = () => useQuery({
     retry: false,
   });
 
-export const fetchAllWorkouts = (email:string | undefined) => (!email) ? null : useQuery({
-    queryKey: ["fetchAllWorkouts", email],
+export const useFetchWorkouts = (email:string | undefined) => useQuery({
+    queryKey: ["useFetchWorkouts", email],
     queryFn: async (): Promise<WOResponse[]> => {
-      const response = await fetch(`${rootURL}/workouts/user`, {credentials:"include"});
+      const loginToken = await getLoginToken();
+      if (!loginToken) throw new Error("Not logged in");
+
+      const response = await fetch(`${rootURL}/workouts/user`,
+        {
+          headers: {"Authorization": `Bearer ${loginToken}`}
+        }
+      );
       if (!response.ok) throw new Error("Network error");
       return response.json();
     },
     retry: false,
+    enabled: (email != undefined)
   });
 
 /*

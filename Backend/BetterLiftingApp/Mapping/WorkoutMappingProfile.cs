@@ -13,11 +13,13 @@ namespace BetterLiftingApp.Mapping
             // DB Data -> Response payloads
             // Backend -> Frontend
             CreateMap<WorkoutSet, WOSetResponse>();
-            CreateMap<WorkoutExercise, WOExResponse>();
+            CreateMap<WorkoutExercise, WOExResponse>()
+            .ForMember(response => response.ExerciseName, source => source.MapFrom(src => src.Exercise.ExerciseName));
+            
             CreateMap<Workout, WOResponse>();
 
             // Request payloads -> DB Data
-            // Frontend -> Backend
+            // Frontend -> Backend  
             CreateMap<WOSetRequest, WorkoutSet>();
             CreateMap<WOExRequest, WorkoutExercise>();
             CreateMap<WORequest, Workout>();

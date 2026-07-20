@@ -1,20 +1,19 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { AuthErrorResponse, LoginRequest, LoginResponse } from "../Data/AuthData";
+import type { AuthErrorResponse, LoginRequest, LoginResponse, UserInfo } from "../Data/AuthData";
 import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { Platform } from "react-native";
 
 const rootURL = "http://localhost:5240/api/auth";
-
-// returned by .NET when checking if user is logged in
-interface UserInfo {
-    email: string;
-    isEmailConfirmed: boolean;
-}
 // Token services -> For storing login JWTs securely on the device with expo secure store
 
+export const saveTokens      = async (data: LoginResponse): Promise<void> => (Platform.OS === "web") ? saveTokens_dev(data)  : await saveTokens_mobile(data);
+export const getLoginToken   = async (): Promise<string | null>           => (Platform.OS === "web") ? getLoginToken_dev()   : await getLoginToken_mobile();
+export const getRefreshToken = async (): Promise<string | null>           => (Platform.OS === "web") ? getRefreshToken_dev() : await getRefreshToken_mobile();
+export const clearTokens     = async (): Promise<void>                    => (Platform.OS === "web") ? clearTokens_dev()     : await clearTokens_mobile();
+
 // For prod and mobile -> expo secure store
-export const saveTokens = async ({tokenType, accessToken, refreshToken}:LoginResponse): Promise<void> => {
+export const saveTokens_mobile = async ({tokenType, accessToken, refreshToken}:LoginResponse): Promise<void> => {
     try {
         await SecureStore.setItemAsync("LOGIN_TOKEN_TYPE", tokenType);
         await SecureStore.setItemAsync ("LOGIN_TOKEN", accessToken);
@@ -25,9 +24,9 @@ export const saveTokens = async ({tokenType, accessToken, refreshToken}:LoginRes
     }
 }
 
-export const getLoginToken = async (): Promise<string | null> => await SecureStore.getItemAsync("LOGIN_TOKEN");
-export const getRefreshToken = async (): Promise<string | null> => await SecureStore.getItemAsync("REFRESH_TOKEN"); 
-export const clearTokens = async (): Promise<void> => {
+export const getLoginToken_mobile = async (): Promise<string | null> => await SecureStore.getItemAsync("LOGIN_TOKEN");
+export const getRefreshToken_mobile = async (): Promise<string | null> => await SecureStore.getItemAsync("REFRESH_TOKEN"); 
+export const clearTokens_mobile = async (): Promise<void> => {
     try {
         await SecureStore.deleteItemAsync("LOGIN_TOKEN");
         await SecureStore.deleteItemAsync("REFRESH_TOKEN");
@@ -61,8 +60,8 @@ export const clearTokens_dev = (): void => {
 }
 // End token services
 
-// API services
-export const attemptRegister = () => {
+// API services (Hooks)
+export const useRegisterAttempt = () => {
     const queryClient = useQueryClient();
 
     const sendRegisterRequest = async (payload: LoginRequest) => {
@@ -74,7 +73,7 @@ export const attemptRegister = () => {
         if (!response.ok)
         {
             const errorData = await response.json();
-            throw errorData;
+            return Promise.reject({errors: errorData.errors})
         }
 
         return response.text(); // Returns empty body on successful registration
@@ -82,10 +81,16 @@ export const attemptRegister = () => {
 
     return useMutation({
         mutationFn: sendRegisterRequest,
-        onSuccess: async (data, variables) => {
-            console.log("Registration successful:", data);
+        onSuccess: async (_, variables) => {
+            console.log("Registration successful");
             await queryClient.invalidateQueries({queryKey: ["authUser"]})
-            router.replace("/(tabs)");
+
+            // After creating user, sign in as this user (using same credentials)
+            const {mutate:login} = useLoginAttempt();
+            login(variables);
+
+            // Redirect
+            router.replace("/");
         },
         onError: (err:AuthErrorResponse) => {
             console.log("Registration failed:", err.errors);
@@ -94,7 +99,7 @@ export const attemptRegister = () => {
 }
 
 // Send login request to backend using tokens
-export const attemptLogin = () => {
+export const useLoginAttempt = () => {
     const queryClient = useQueryClient();
 
     const sendLoginRequest = async (payload : LoginRequest): Promise<LoginResponse> => {
@@ -108,21 +113,19 @@ export const attemptLogin = () => {
             if (response.status === 401) return Promise.reject(new Error("Invalid username or password."));
             throw new Error(`Network error, HTTP code ${response.status}`);
         }
-        // console.log("Received login response:", await response.text());
 
         const tokenData: LoginResponse = await response.json();
-        if (Platform.OS === "web") saveTokens_dev(tokenData);
-        else await saveTokens(tokenData);
+        await saveTokens(tokenData);
 
         return tokenData;
     };
 
     return useMutation({
         mutationFn: sendLoginRequest,
-        onSuccess: async (_, variables) => {
-            console.log("Login successful:");
-            await queryClient.invalidateQueries({queryKey: ["authUser"]})
-            router.replace("/(tabs)");
+        onSuccess: (_, variables) => {
+            console.log("Login successful");
+            queryClient.invalidateQueries({queryKey: ["authUser"]})
+            router.replace("/");
 
         },
         onError: (err) => {
@@ -132,10 +135,10 @@ export const attemptLogin = () => {
 }
 
 // Send logout request to backend
-export const attemptLogout = () => {
+export const useLogout = () => {
     const queryClient = useQueryClient();
      const sendLogoutRequest = async () => {
-        const loginToken = (Platform.OS === "web") ? getLoginToken_dev() : await getLoginToken();
+        const loginToken = await getLoginToken();
         const response = await fetch(`${rootURL}/logout`, {
             method: "POST",
             headers: {"Authorization": `Bearer ${loginToken}`}
@@ -153,7 +156,7 @@ export const attemptLogout = () => {
         onSuccess: async (_, variables) => {
             console.log("Logout successful:");
             await queryClient.invalidateQueries({queryKey: ["authUser"]});
-            (Platform.OS === "web") ? clearTokens_dev() : await clearTokens();
+            await clearTokens();
             router.replace("/auth/login");
 
         },
@@ -167,10 +170,8 @@ export const attemptLogout = () => {
 export const checkLoggedIn = () => useQuery({
     queryKey: ["authUser"],
     queryFn: async (): Promise<UserInfo | null> => {
-        const loginToken = (Platform.OS === "web") ? getLoginToken_dev() : await getLoginToken();
-        // If not currently logged in
+        const loginToken = await getLoginToken();
         if (!loginToken) return null;
-
 
         const response = await fetch(`${rootURL}/manage/info`, {
             // Authenticate with saved login token
@@ -178,11 +179,13 @@ export const checkLoggedIn = () => useQuery({
         }
         );
         if (!response.ok) {
-            if (response.status === 401) { (Platform.OS === "web") ? clearTokens_dev() : await clearTokens(); } // Clear saved tokens if no longer valid
+            if (response.status === 401) await clearTokens(); // Clear saved tokens if no longer valid
             return null;
         };
 
-        return response.json(); 
+        const data: UserInfo | null = await response.json();
+        if (data) console.log (`Logged in, Email: ${data.email}`);
+        return data;
     },
     retry:false,
     staleTime: 60000 // Keep auth valid for one minute

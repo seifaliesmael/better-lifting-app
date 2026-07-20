@@ -1,7 +1,7 @@
 import type { WOResponse } from "../../Data/Responses";
 import { useContext, useState } from "react";
 import { ThemeContext } from "../../contexts/theme/ThemeContext";
-import { fetchAllWorkouts } from "../../api/dataServices";
+import { useFetchWorkouts } from "../../api/dataServices";
 import { checkLoggedIn } from "../../api/authServices";
 import { ListRender } from "@/components/Display/ListRender";
 import WorkoutDisplay from "@/components/Display/WorkoutDisplay";
@@ -9,26 +9,27 @@ import { ActivityIndicator, View, Text, Pressable } from "react-native";
 import { CardTitle } from "@/components/ui/Card";
 
 export const WorkoutsScreen = () => {
-  const { data } = checkLoggedIn();
+  const { data:loginData, isLoading:loginLoading } = checkLoggedIn();
   const [showWorkout, setShowWorkout] = useState<boolean>(false);
   const [currWorkout, setCurrWorkout] = useState<WOResponse | undefined>(
     undefined,
   );
   const { theme } = useContext(ThemeContext);
 
-  const workoutListResponse = fetchAllWorkouts(data?.email);
+  const workoutListResponse = useFetchWorkouts(loginData?.email);
 
   const isLight = theme === "light";
   const textColor = isLight ? "text-black" : "text-white";
   const dividerColor = isLight ? "bg-gray-300" : "bg-gray-600";
 
-  if (!workoutListResponse)
+  if (!loginData && !loginLoading) 
+  {
     return (
       <View className="flex-1 justify-center items-center">
         <Text className={`text-base ${textColor}`}>Not logged in.</Text>
       </View>
     );
-
+  }
   if (workoutListResponse.isLoading) {
     return (
       <ActivityIndicator
@@ -57,6 +58,8 @@ export const WorkoutsScreen = () => {
       </View>
     );
   }
+
+  console.log(JSON.stringify(workoutListResponse.data));
 
   const handleShow = () => {
     setShowWorkout(true);

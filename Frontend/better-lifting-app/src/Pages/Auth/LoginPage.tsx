@@ -56,7 +56,7 @@ const LoginPage = ({updateView} : Props) => {
               (<p className="text-danger small">
                 Invalid username or password.
               </p>)
-              : ""
+              : null
             }
 
             <Button 

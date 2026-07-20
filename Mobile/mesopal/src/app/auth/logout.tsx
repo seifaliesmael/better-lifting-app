@@ -1,46 +1,61 @@
-import { attemptLogin, attemptLogout } from "@/api/authServices";
+import { useLogout } from "@/api/authServices";
 import { Card } from "@/components/ui/Card";
 import { ThemeContext } from "@/contexts/theme/ThemeContext";
-import { router } from "expo-router";
-import { useState, useContext } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  KeyboardAvoidingView,
-  Platform,
-} from "react-native";
+// 1. Import Stack and View
+import { router, Stack } from "expo-router"; 
+import { View, Text, Pressable } from "react-native";
+import { useContext } from "react";
 
 const LogoutPage = () => {
   const { theme } = useContext(ThemeContext);
-  const {mutate} = attemptLogout();
+  const { mutate:logout } = useLogout();
 
   const isLight = theme === "light";
   const textColor = isLight ? "text-black" : "text-white";
-
-  const handleLogout = () => mutate();
+  
+  const bgColor = isLight ? "bg-gray-100" : "bg-gray-900";
 
   const logoutButton = (
     <Pressable
-      className="bg-blue-600 w-full py-3 rounded-lg mt-4 mb-4 active:bg-blue-700"
-      onPress={handleLogout}
+      className="bg-blue-600 w-full py-3 rounded-lg mt-4 active:bg-blue-700"
+      onPress={() => logout()}
     >
       <Text className="text-white text-center font-bold text-base">Log out</Text>
     </Pressable>
   );
 
+  const backButton = (
+    <Pressable
+    className="bg-gray-100 w-full py-3 rounded-lg mt-4 border border-gray-200 active:bg-gray-200"
+    onPress={() => router.back()}
+    >
+      <Text className="text-blue-600 text-center font-bold text-base"> Back </Text> 
+    </Pressable>
+  )
+
   return (
-      <Card className="w-full max-w-[400px] border-0">
+    <View className={`flex-1 justify-center items-center px-4 ${bgColor}`}>
+      
+      <Stack.Screen options={{
+         title: 'Logout',
+          }} />
+
+      <Card className="w-full max-w-[400px] border-0 shadow-sm">
         <Card.Body className="p-6">
           <Text className={`text-3xl font-bold text-center mb-6 ${textColor}`}>
             Logout
           </Text>
 
-          <Text> Are you sure you wish to log out of MesoPal?</Text>
+          <Text className={`text-center text-base mb-4 ${textColor}`}>
+            Are you sure you wish to log out of MesoPal?
+          </Text>
+          
           {logoutButton}
+          {backButton}
         </Card.Body>
       </Card>
+      
+    </View>
   );
 };
 
