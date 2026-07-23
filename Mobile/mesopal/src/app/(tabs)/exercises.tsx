@@ -1,12 +1,12 @@
 import { View, Text, ActivityIndicator } from 'react-native';
 import { equipmentTypes } from '../../Data/LocalData';
-import { fetchAllExercises } from '../../api/dataServices';
+import { useFetchExercises } from '../../api/dataServices';
 import { ThemeContext } from '../../contexts/theme/ThemeContext';
 import { useContext } from 'react';
 import { ListRender } from '@/components/Display/ListRender';
 
 const ExerciseList = () => {
-  const { data, isLoading, error } = fetchAllExercises();
+  const { data, isLoading, error } = useFetchExercises();
   const { theme } = useContext(ThemeContext);
 
   if (isLoading) {

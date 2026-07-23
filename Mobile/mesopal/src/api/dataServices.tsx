@@ -11,7 +11,7 @@ Fetch Methods
 -----------------------------------------------------------------------
 */
 
-export const fetchAllExercises = () => useQuery({
+export const useFetchExercises = () => useQuery({
     queryKey: ["fetchExercises"],
     queryFn: async (): Promise<ExResponse[]> => {
       const response = await fetch(`${rootURL}/exercises`);

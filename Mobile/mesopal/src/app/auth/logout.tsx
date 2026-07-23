@@ -5,6 +5,7 @@ import { ThemeContext } from "@/contexts/theme/ThemeContext";
 import { router, Stack } from "expo-router"; 
 import { View, Text, Pressable } from "react-native";
 import { useContext } from "react";
+import DarkModeButton from "@/components/ui/DarkModeButton";
 
 const LogoutPage = () => {
   const { theme } = useContext(ThemeContext);
@@ -20,7 +21,7 @@ const LogoutPage = () => {
       className="bg-blue-600 w-full py-3 rounded-lg mt-4 active:bg-blue-700"
       onPress={() => logout()}
     >
-      <Text className="text-white text-center font-bold text-base">Log out</Text>
+      <Text className="text-white text-center font-bold text-base">Log Out</Text>
     </Pressable>
   );
 
@@ -36,14 +37,20 @@ const LogoutPage = () => {
   return (
     <View className={`flex-1 justify-center items-center px-4 ${bgColor}`}>
       
-      <Stack.Screen options={{
-         title: 'Logout',
-          }} />
+      <Stack.Screen options={{ 
+        headerLeft: () => null,
+        headerRight: () => <DarkModeButton/>,
+        headerStyle:{backgroundColor: (isLight ? "#ffffff" : "#0f172a")},
+        headerTitle: () => (
+        <Text className="text-black dark:text-white font-semibold text-lg">
+          Log Out
+        </Text>
+      )}} />
 
       <Card className="w-full max-w-[400px] border-0 shadow-sm">
         <Card.Body className="p-6">
           <Text className={`text-3xl font-bold text-center mb-6 ${textColor}`}>
-            Logout
+            Log Out
           </Text>
 
           <Text className={`text-center text-base mb-4 ${textColor}`}>

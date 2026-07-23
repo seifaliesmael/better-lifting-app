@@ -1,5 +1,6 @@
 import { useRegisterAttempt } from "@/api/authServices";
 import { Card } from "@/components/ui/Card";
+import DarkModeButton from "@/components/ui/DarkModeButton";
 import { ThemeContext } from "@/contexts/theme/ThemeContext";
 import { router, Stack } from "expo-router";
 import { useState, useContext } from "react";
@@ -60,13 +61,19 @@ const RegisterPage = () => {
       enableOnAndroid={true}
       keyboardShouldPersistTaps="handled"
       extraScrollHeight={20} 
+      className="bg-[#ffffff] dark:bg-[#0f172a]"
+
     >
-      <Stack.Screen
-        options={{
-          title: "Register",
-          headerLeft: () => null,
-        }}
-      />
+      <Stack.Screen options={{ 
+        headerLeft: () => null,
+        headerRight: () => <DarkModeButton/>,
+        headerStyle:{backgroundColor: (isLight ? "#ffffff" : "#0f172a")},
+        headerTitle: () => (
+        <Text className="text-black dark:text-white font-semibold text-lg">
+          Register
+        </Text>
+      )}} />
+
         <Card className="w-full max-w-[400px] border-0">
           <Card.Body className="p-6">
             <Text

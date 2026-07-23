@@ -5,8 +5,8 @@ import { router } from "expo-router";
 import { Platform } from "react-native";
 
 const rootURL = "http://localhost:5240/api/auth";
-// Token services -> For storing login JWTs securely on the device with expo secure store
 
+// Token services -> For storing login JWTs securely on the device with expo secure store
 export const saveTokens      = async (data: LoginResponse): Promise<void> => (Platform.OS === "web") ? saveTokens_dev(data)  : await saveTokens_mobile(data);
 export const getLoginToken   = async (): Promise<string | null>           => (Platform.OS === "web") ? getLoginToken_dev()   : await getLoginToken_mobile();
 export const getRefreshToken = async (): Promise<string | null>           => (Platform.OS === "web") ? getRefreshToken_dev() : await getRefreshToken_mobile();

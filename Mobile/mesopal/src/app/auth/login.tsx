@@ -1,5 +1,6 @@
 import { useLoginAttempt } from "@/api/authServices";
 import { Card } from "@/components/ui/Card";
+import DarkModeButton from "@/components/ui/DarkModeButton";
 import { ThemeContext } from "@/contexts/theme/ThemeContext";
 import { router, Stack } from "expo-router";
 import { useState, useContext } from "react";
@@ -46,12 +47,18 @@ const LoginPage = () => {
       enableOnAndroid={true}
       keyboardShouldPersistTaps="handled"
       extraScrollHeight={20} 
+      className="bg-[#ffffff] dark:bg-[#0f172a]"
     >
 
       <Stack.Screen options={{ 
-        title: 'Login', 
-        headerLeft: () => null
-       }} />
+        headerLeft: () => null,
+        headerRight: () => <DarkModeButton/>,
+        headerStyle:{backgroundColor: (isLight ? "#ffffff" : "#0f172a")},
+        headerTitle: () => (
+        <Text className="text-black dark:text-white font-semibold text-lg">
+          Login
+        </Text>
+      )}} />
 
       <Card className="w-full max-w-[400px] border-0">
         <Card.Body className="p-6">

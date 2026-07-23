@@ -28,12 +28,9 @@ export const CardBody = ({ children, className, ...props }: ViewProps) => {
 export const CardMain = ({ children, className, ...props }: ViewProps) => {
   const { theme } = useContext(ThemeContext);
   
-  const bgColor = theme === 'light' ? 'bg-white' : 'bg-[#2b3035]';
-  const borderColor = theme === 'light' ? 'border-gray-200' : 'border-gray-700';
-
   return (
     <View 
-      className={`border rounded-xl shadow-sm overflow-hidden mb-4 ${bgColor} ${borderColor} ${className || ''}`}
+      className={`border rounded-xl shadow-sm overflow-hidden mb-4 bg-white dark:bg-[#2b3035] border-gray-200 dark:border-gray-700 ${className || ''}`}
       {...props}
     >
       {children}

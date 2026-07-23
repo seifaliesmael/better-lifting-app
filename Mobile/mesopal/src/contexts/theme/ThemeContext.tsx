@@ -1,4 +1,5 @@
 import { createContext, useState, type ReactNode } from "react";
+import { colorScheme } from "nativewind";
 
 interface ThemeData {
     theme:string;
@@ -14,8 +15,10 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const [theme, setTheme] = useState("light");
     
     const toggleTheme = () => {
-        console.log("Toggling theme");
+        const newTheme = (theme === "light") ? "dark" : "light";
+        colorScheme.set(newTheme);
         setTheme((prevTheme:string) => prevTheme === "dark" ? "light" : "dark");
+        
     }
 
     return (
