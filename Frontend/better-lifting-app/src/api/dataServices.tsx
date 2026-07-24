@@ -2,8 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { ExRequest, WORequest } from "../Data/Requests";
 import type { ExResponse, MuscleResponse, WOResponse } from "../Data/Responses";
 
-const rootURL = "http://localhost:5240/api";
-
+const rootURL = import.meta.env.VITE_API_BASE_URL;
 /*
 -----------------------------------------------------------------------
 Fetch Methods
