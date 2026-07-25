@@ -35,9 +35,7 @@ const handleClose = () => {setShowWorkout(false)}
               <Card.Text> {currWorkout?.notes} </Card.Text>
             </Card.Body>
           </Card>
-        ) : (
-          ""
-        )}
+        ) : null}
 
         {currWorkout?.workoutExercises.map((we, exIndex) => (
           <div key={exIndex} className={exIndex != 0 ? "mt-4" : ""}>

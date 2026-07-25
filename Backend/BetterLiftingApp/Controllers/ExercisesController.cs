@@ -25,6 +25,7 @@ namespace BetterLiftingApp.Controllers
         {
             Console.WriteLine("Received a get all request at Exercises");
             List<Exercise> exercises = await context.Exercises.Include(e => e.MuscleGroups).ToListAsync();
+            Console.WriteLine("Sending data: " + JsonSerializer.Serialize(exercises));
             return Ok(exercises);
         }
 
