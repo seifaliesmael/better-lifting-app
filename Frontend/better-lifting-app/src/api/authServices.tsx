@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { AuthErrorResponse, LoginRequest } from "../Data/AuthData";
 
-const rootURL = "http://localhost:5240/api/auth";
+const rootURL = `${import.meta.env.VITE_API_BASE_URL}/auth`;
 
 interface RequestProps {
     payload: LoginRequest;

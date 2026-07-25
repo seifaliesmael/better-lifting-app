@@ -53,7 +53,7 @@ export const SaveWorkoutButton = ({
       start: startTime,
       end: new Date(),
       workoutExercises: exercises.map(
-        ({ name, id, workoutSets, ...rest }, index) => ({
+        ({ exerciseName, id, workoutSets, ...rest }, index) => ({
           ...rest,
           order: index,
           workoutSets: workoutSets.map((set, index) => ({

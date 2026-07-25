@@ -10,22 +10,34 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<LiftingContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection"))
 ); // DB Context for Data
 
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 .AddEntityFrameworkStores<LiftingContext>(); // Add automatic identity and auth services to the db context.
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Allow auth cookie to be sent to a different site (frontend)
+   options.Cookie.SameSite = SameSiteMode.None; 
+   
+   // Cookie is only sent over HTTPS (encrypted)
+   options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddAutoMapper(typeof(Program));
+
+// Fetch frontend and mobile IPs
+string[] allowedOrigins = builder.Configuration["AllowedOrigins"]?.Split(",") ?? [];
 
 // CORS so Front-end can access data
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowLocalDev",
+    options.AddPolicy("AllowFrontend",
     policy =>
     {
-        policy.WithOrigins("http://localhost:5173", "http://localhost:8081") // TODO: separate front-end port to config
+        policy.WithOrigins(allowedOrigins)
         .AllowAnyHeader()
         .AllowAnyMethod()
         .AllowCredentials();
@@ -51,7 +63,7 @@ if (app.Environment.IsDevelopment())
 
 // app.UseHttpsRedirection(); TODO: Add HTTPS back
 
-app.UseCors("AllowLocalDev");
+app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
