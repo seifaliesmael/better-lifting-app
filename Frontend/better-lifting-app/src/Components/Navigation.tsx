@@ -36,9 +36,16 @@ const Navbar = ({ updateView }: Props) => {
     <Container>
       <Row>
         <NavButton text="View Exercises" navTarget="exercisesPage" />
-        <NavButton text="View Muscle Groups" navTarget="musclegroupsPage" />
         <NavButton text="View Workouts" navTarget="workoutsPage" />
-        <NavButton navTarget="createExercisePage" text="Create New Exercise" />
+
+        {/* Admin controls */}
+        {authResponse.data?.email == "seifali.esmael@gmail.com"
+        ? <>
+            <NavButton text="View Muscle Groups" navTarget="musclegroupsPage" />
+            <NavButton navTarget="createExercisePage" text="Create New Exercise" />
+          </>
+        : null}
+
         <NavButton navTarget="createWorkoutPage" text="New Workout" />
         {authResponse.data ? (
           <Col>
