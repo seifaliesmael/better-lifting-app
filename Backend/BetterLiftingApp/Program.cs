@@ -18,6 +18,15 @@ builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false)
 .AddEntityFrameworkStores<LiftingContext>(); // Add automatic identity and auth services to the db context.
 
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Allow auth cookie to be sent to a different site (frontend)
+   options.Cookie.SameSite = SameSiteMode.None; 
+   
+   // Cookie is only sent over HTTPS (encrypted)
+   options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
 builder.Services.AddAutoMapper(typeof(Program));
 
 // Fetch frontend and mobile IPs
