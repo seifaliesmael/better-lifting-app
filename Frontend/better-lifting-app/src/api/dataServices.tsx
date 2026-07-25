@@ -64,7 +64,7 @@ export const createWorkout = async (
 export const createExercise = async (
   payload: ExRequest,
 ): Promise<ExResponse> => {
-  const response = await fetch("http://localhost:5240/api/Exercises", {
+  const response = await fetch(`${rootURL}/Exercises`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
