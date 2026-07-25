@@ -61,7 +61,7 @@ const LoginPage = ({updateView} : Props) => {
 
             <Button 
               variant="primary" 
-              disabled={!isPending}
+              disabled={isPending}
               className="w-100 py-2 mb-4 fw-bold mt-4"
               onClick={() => handleLogin()}
             >
