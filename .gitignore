@@ -5,6 +5,7 @@
 bin/
 obj/
 TestResults/
+publish/
 
 # User-specific configuration files
 *.user
