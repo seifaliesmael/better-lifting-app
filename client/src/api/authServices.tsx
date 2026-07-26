@@ -93,6 +93,11 @@ export const useRegisterAttempt = () => {
         mutationFn:sendRegisterRequest,
         onSuccess: (data, variables) => {
             queryClient.invalidateQueries({queryKey: ["authUser"]})
+
+            // Log in to created account upon success
+            const {mutate:triggerLogin} = useLoginAttempt();
+            triggerLogin(variables);
+            
             router.replace("/");
         },
         onError: (err:AuthErrorResponse) => {
