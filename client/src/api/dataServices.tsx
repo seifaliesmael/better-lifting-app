@@ -3,7 +3,7 @@ import type { ExRequest, WORequest } from "../Data/Requests";
 import type { ExResponse, MuscleResponse, WOResponse } from "../Data/Responses";
 import { getLoginToken } from "./authServices";
 
-const rootURL = "http://localhost:5240/api";
+const rootURL = `${process.env.EXPO_PUBLIC_API_BASE_URL}/auth`;
 
 /*
 -----------------------------------------------------------------------

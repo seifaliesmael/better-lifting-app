@@ -4,7 +4,7 @@ import * as SecureStore from "expo-secure-store";
 import { router } from "expo-router";
 import { Platform } from "react-native";
 
-const rootURL = "http://localhost:5240/api/auth";
+const rootURL = `${process.env.EXPO_PUBLIC_API_BASE_URL}`;
 const isWeb = Platform.OS === "web";
 
 
