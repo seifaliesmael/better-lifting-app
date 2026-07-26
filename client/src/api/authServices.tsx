@@ -71,6 +71,36 @@ export const useLoginAttempt = () => {
     });
 };
 
+export const useRegisterAttempt = () => {
+    const queryClient = useQueryClient();
+
+    const sendRegisterRequest = async (payload: {email:string, password:string}) => {
+        const response = await fetch(`${rootURL}/register`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+        if (!response.ok)
+        {
+            const errorData = await response.json();
+            throw errorData;
+        }
+
+        return response.text(); // Returns empty body on successful registration
+    };
+
+    return useMutation({
+        mutationFn:sendRegisterRequest,
+        onSuccess: (data, variables) => {
+            queryClient.invalidateQueries({queryKey: ["authUser"]})
+            router.replace("/");
+        },
+        onError: (err:AuthErrorResponse) => {
+            console.log("Registration failed:", err.errors);
+        }
+    });
+}
+
 export const useLogout = () => {
     const queryClient = useQueryClient();
     const sendLogoutRequest = async () => {
