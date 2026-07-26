@@ -2,8 +2,10 @@ import { useQuery } from "@tanstack/react-query";
 import type { ExRequest, WORequest } from "../Data/Requests";
 import type { ExResponse, MuscleResponse, WOResponse } from "../Data/Responses";
 import { getLoginToken } from "./authServices";
+import { Platform } from "react-native";
 
-const rootURL = `${process.env.EXPO_PUBLIC_API_BASE_URL}/auth`;
+const rootURL = `${process.env.EXPO_PUBLIC_API_BASE_URL}`;
+const isWeb = Platform.OS === "web";
 
 /*
 -----------------------------------------------------------------------
@@ -22,7 +24,7 @@ export const useFetchExercises = () => useQuery({
     refetchOnWindowFocus: false,
 });
 
-export const fetchAllMuscleGroups = () => useQuery({
+export const useFetchMuscleGroups = () => useQuery({
     queryKey: ["fetchMuscleGroups"],
     queryFn: async (): Promise<MuscleResponse[]> => {
       const response = await fetch(`${rootURL}/musclegroups`);
@@ -32,23 +34,25 @@ export const fetchAllMuscleGroups = () => useQuery({
     retry: false,
   });
 
-export const useFetchWorkouts = (email:string | undefined) => useQuery({
+export const useFetchWorkouts = (email: string | undefined) => useQuery({
     queryKey: ["useFetchWorkouts", email],
     queryFn: async (): Promise<WOResponse[]> => {
-      const loginToken = await getLoginToken();
-      if (!loginToken) throw new Error("Not logged in");
+      const loginToken = await getLoginToken(); // null on web — that's fine
 
-      const response = await fetch(`${rootURL}/workouts/user`,
-        {
-          headers: {"Authorization": `Bearer ${loginToken}`}
-        }
-      );
-      if (!response.ok) throw new Error("Network error");
+      const response = await fetch(`${rootURL}/workouts/user`, {
+        credentials: "include", // sends the httpOnly cookie on web
+        headers: isWeb || !loginToken ? {} : { "Authorization": `Bearer ${loginToken}` },
+      });
+
+      if (!response.ok) {
+        if (response.status === 401) throw new Error("Not logged in");
+        throw new Error(`Network error, HTTP code ${response.status}`);
+      }
       return response.json();
     },
     retry: false,
     enabled: (email != undefined)
-  });
+});
 
 /*
 -----------------------------------------------------------------------
@@ -57,25 +61,26 @@ Post Methods
 */
 
 // Push workout to DB
-export const createWorkout = async (
-  payload: WORequest,
-): Promise<WOResponse> => {
+export const useCreateWorkout = async (payload: WORequest): Promise<WOResponse> => {
+  const loginToken = await getLoginToken();
   const response = await fetch(`${rootURL}/workouts`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(isWeb || !loginToken ? {} : { "Authorization": `Bearer ${loginToken}` }),
+    },
     body: JSON.stringify(payload),
-    credentials:"include"
+    credentials: "include",
   });
-  if (!response.ok)
-    throw new Error(`Network error, HTTP code ${response.status}`);
+  if (!response.ok) throw new Error(`Network error, HTTP code ${response.status}`);
   return response.json();
 };
 
 // Push new exercise to DB
-export const createExercise = async (
+export const useCreateExercise = async (
   payload: ExRequest,
 ): Promise<ExResponse> => {
-  const response = await fetch("http://localhost:5240/api/exercises", {
+  const response = await fetch(`${rootURL}/exercises`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
