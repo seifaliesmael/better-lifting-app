@@ -23,16 +23,13 @@ namespace BetterLiftingApp.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Exercise>>> GetAllExercises()
         {
-            Console.WriteLine("Received a get all request at Exercises");
             List<Exercise> exercises = await context.Exercises.Include(e => e.MuscleGroups).ToListAsync();
-            Console.WriteLine("Sending data: " + JsonSerializer.Serialize(exercises));
             return Ok(exercises);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Exercise>> GetExercise(int id)
         {
-            Console.WriteLine($"Received a get request for id {id}");
             Exercise? exercise = await context.Exercises.FindAsync(id);
             
             if (exercise == null) return NotFound();
@@ -42,10 +39,6 @@ namespace BetterLiftingApp.Controllers
         [HttpPost]
         public async Task<ActionResult<Exercise>> AddExercise(ExRequest newEx)
         {
-            Console.WriteLine($"Received a post request for new exercise");
-            Console.WriteLine(JsonSerializer.Serialize(newEx));
-            Console.WriteLine("Muscle groups:" + newEx.MuscleGroupIDs.ToArray().ToString());
-
             if (newEx == null) return BadRequest();
 
             // Convert request payload to DB Exercise (will not map musclegroups automatically)            

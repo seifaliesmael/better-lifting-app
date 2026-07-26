@@ -27,8 +27,6 @@ const LoginPage = () => {
   const mutedText = isLight ? "text-gray-500" : "text-gray-400";
 
   const handleLogin = () => {
-    if (isPending) console.log("Pending login attempt");
-    console.log("Login attempted:", { email, password });
     mutate({ email, password });
   };
 

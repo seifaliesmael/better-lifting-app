@@ -29,14 +29,10 @@ namespace BetterLiftingApp.Controllers
         [HttpGet("user")]
         [Authorize]
         public async Task<ActionResult<List<WOResponse>>> GetAllWorkouts()
-        {
-            Console.WriteLine("Received a get all request at Workouts");
-            
+        {            
             // Get userid from HttpOnly cookie
             string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userid == null || userid == "") return Unauthorized("User ID not found.");
-
-            Console.WriteLine("User ID received: " + userid);
 
             // Find user's DB workouts -> include statements otherwise lazy loading will only give a shallow copy (top level)
             List<Workout> wks = await context.Workouts.Where(w => w.UserId == userid)
@@ -52,8 +48,6 @@ namespace BetterLiftingApp.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<WOResponse>> GetWorkout(int id)
         {
-            Console.WriteLine($"Received a get request for id: {id}");
-
             // Find workout with corresponding ID
             Workout? wk = await context.Workouts.Where(w => w.Id == id)
             .Include(w => w.WorkoutExercises).ThenInclude(we => we.Exercise)
@@ -71,10 +65,6 @@ namespace BetterLiftingApp.Controllers
         [Authorize]
         public async Task<ActionResult<WORequest>> AddWorkout(WORequest payload)
         {
-            // For Debugging
-            Console.WriteLine("Received a workout create request with body:");
-            Console.WriteLine(JsonSerializer.Serialize(payload));
-
             // Get userid from HttpOnly cookie
             string? userid = User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userid == null || userid == "") return Unauthorized("User ID not found.");

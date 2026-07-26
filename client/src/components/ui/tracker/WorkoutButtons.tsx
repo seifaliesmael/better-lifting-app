@@ -111,8 +111,6 @@ export const SaveWorkoutButton = ({
       ),
     };
 
-    console.log("Creating resource:", JSON.stringify(payload));
-
     try {
       await useCreateWorkout(payload);
       resetFields();

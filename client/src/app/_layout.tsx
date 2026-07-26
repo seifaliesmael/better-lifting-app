@@ -10,7 +10,6 @@ configureReanimatedLogger({
 });
 
 export default function RootLayout() {
-  console.log('RootLayout render');
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider>
