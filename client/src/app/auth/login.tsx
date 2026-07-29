@@ -17,7 +17,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 const LoginPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
-  const { mutate, isPending, isError } = useLoginAttempt();
+  const { mutate, isPending, isError, error} = useLoginAttempt();
   const { theme } = useContext(ThemeContext);
 
   const isLight = theme === "light";
@@ -99,9 +99,14 @@ const LoginPage = () => {
 
           {/* Login error */}
           {isError ? (
-            <Text className="text-red-500 text-sm mb-4">
-              Invalid username or password.
-            </Text>
+            error.message.includes("NetworkError") ? (
+              <Text className="text-red-500 text-sm mb-4">
+                Couldn't reach server. Try again in 30s
+              </Text>
+            ) : (
+              <Text className="text-red-500 text-sm mb-4">
+                Invalid username or password.
+              </Text>)
           ) : null}
 
           {loginButton}

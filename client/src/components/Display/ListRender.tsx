@@ -10,14 +10,17 @@ interface Props<T extends DisplayObject> {
   data: T[];
   title: string;
   onClick?: (item: T) => void;
+  cardClass?: string;
   renderData: (item: T) => React.ReactNode;
 }
 
+// Generic list renderer
 export const ListRender = <T extends DisplayObject>({
   data,
   title,
   renderData,
   onClick,
+  cardClass
 }: Props<T>) => {
   const { theme } = useContext(ThemeContext);
 

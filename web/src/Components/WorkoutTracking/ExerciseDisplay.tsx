@@ -26,7 +26,7 @@ export const ExerciseDisplay = ({
   theme,
 }: Props) => {
   // For drag and drop
-    const {ref, handleRef} = useSortable({id:ex.id, index:exIndex});
+  const {ref, handleRef} = useSortable({id:ex.id, index:exIndex});
 
   // Helpers
   const deleteEx = (): void => {

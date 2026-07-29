@@ -29,7 +29,7 @@ const WorkoutDisplay = ({ showWorkout, setShowWorkout, theme, currWorkout }: Pro
       <View className="flex-1 justify-center bg-black/50 p-4">
         
         {/* Modal Container */}
-        <View className={`rounded-xl overflow-hidden bg-white dark:bg-gray-800`}>
+        <View className={`rounded-xl px-4 overflow-hidden bg-white dark:bg-gray-800`}>
           
           {/* Modal.Header */}
           <View className={`flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700`}>

@@ -2,12 +2,14 @@ import { Card } from "@/components/ui/Card";
 import { LocalWorkoutExercise } from "@/Data/LocalData";
 import { ThemeContext } from "@/contexts/theme/ThemeContext";
 import { useContext, useState } from "react";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Pressable } from "react-native";
 import { useFetchExercises } from "@/api/dataServices";
 import { ExResponse } from "@/Data/Responses";
 import { randomUUID } from "expo-crypto";
 import WorkoutTimer from "@/components/ui/tracker/WorkoutTimer";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import AddExerciseDrawer from "@/components/ui/tracker/AddExerciseDrawer";
+import ExerciseDisplay from "@/components/ui/tracker/ExerciseDisplay";
 
 const tracker = () => {
   // Fetch required data
@@ -18,9 +20,9 @@ const tracker = () => {
   const [startTime, _] = useState(new Date());
   const [notes, setNotes] = useState("");
   const [workoutName, setWorkoutName] = useState("");
-  const [workoutExercises, setWorkoutExercises] = useState<
-    LocalWorkoutExercise[]
-  >([]);
+  const [workoutExercises, setWorkoutExercises] = useState<LocalWorkoutExercise[]>([]);
+  const [exDrawerOpen, setExDrawerOpen] = useState<boolean>(false)
+
 
   if (exResponse.isLoading)
     return (
@@ -60,25 +62,41 @@ const tracker = () => {
   };
 
   const isLight = theme === "light";
-  const textColor = isLight ? "text-black" : "text-white";
-  const inputBg = isLight ? "bg-gray-50" : "bg-gray-800";
-  const borderColor = isLight ? "border-gray-300" : "border-gray-600";
+  const textColor = "text-black dark:text-white";
+  const inputBg = "bg-gray-50 dark:bg-gray-800";
+  const borderColor = "border-gray-300 dark:border-gray-600";
+
+  const openExerciseDrawer = () => {setExDrawerOpen(true);}
 
   return (
-    <View className="flex-1 justify-center m-4">
-      <Card className="align-middle h-[700px] gap-3">
-        <Card.Body>
+    <View className="flex-1 m-4">
+
+      {/* Add Exercise Drawer modal */}
+      <AddExerciseDrawer 
+      visible={exDrawerOpen}
+      setVisible={setExDrawerOpen}
+      addExercise={addExercise} />
+
+      {/* Value Selection Modal */}
+      
+
+      {/* Content */}
+      <Card className="align-middle flex-1 gap-3">
+        <Card.Body className="flex-1"> 
           <KeyboardAwareScrollView
+            style={{flex:1}}
             contentContainerStyle={{
               flexGrow: 1,
-              justifyContent: "center",
               alignItems: "center",
               paddingHorizontal: 16,
+              paddingBottom: 24,
             }}
+            // removeClippedSubviews={false}
             enableOnAndroid={true}
             keyboardShouldPersistTaps="handled"
             extraScrollHeight={20}
           >
+            {/* Title and Notes */}
             <Card.Title className="text-center">
               {workoutName ? workoutName : "Untitled Workout"}
             </Card.Title>
@@ -124,9 +142,26 @@ const tracker = () => {
                 />
             </View>
 
-            <Text> My tracker page lmao </Text>
-            <Text> My tracker page lmao </Text>
-            <Text> My tracker page lmao </Text>
+            {/* Current exercises */}
+            {workoutExercises?.map((ex, index) => (
+              <ExerciseDisplay
+                key={ex.id}
+                workoutExercises={workoutExercises}
+                setWorkoutExercises={setWorkoutExercises}
+                ex={ex}
+                exIndex={index}
+              />
+            ))}
+
+            {/* Add Exercise Button */}
+            <Pressable 
+            className="mt-4 p-2 rounded-lg bg-blue-500"
+            onPress={() => openExerciseDrawer()}
+            >
+              <Text className="text-base text-gray-100 font-semibold">
+                Add Exercise
+              </Text>
+            </Pressable>
           </KeyboardAwareScrollView>
         </Card.Body>
       </Card>
