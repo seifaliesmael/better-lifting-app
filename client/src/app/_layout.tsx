@@ -11,7 +11,6 @@ configureReanimatedLogger({
 });
 
 export default function RootLayout() {
-  console.log('RootLayout render');
   return (
     <GestureHandlerRootView style={{flex:1}}>
       <QueryClientProvider client={queryClient}>

@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const { theme } = useContext(ThemeContext);
-  const { mutate, isPending, error, isError } = useRegisterAttempt();
+  const { mutate, error, isError } = useRegisterAttempt();
 
   const isLight = theme === "light";
   const textColor = isLight ? "text-black" : "text-white";
@@ -38,8 +38,6 @@ const RegisterPage = () => {
   const passwordErrors = getErrors("password");
 
   const handleRegister = () => {
-    if (isPending) console.log("Pending registration attempt");
-    console.log("Registration attempted:", { email, password });
     mutate({ email, password });
   };
 

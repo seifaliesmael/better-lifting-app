@@ -17,10 +17,10 @@ export const WorkoutsScreen = () => {
   const { theme } = useContext(ThemeContext);
   const workoutListResponse = useFetchWorkouts(loginData?.email);
 
-  // DEV DEBUG
-  useEffect(() => {
-    console.log(JSON.stringify(workoutListResponse.data));
-  }, [workoutListResponse.data])
+  // // DEV DEBUG
+  // useEffect(() => {
+  //   console.log(JSON.stringify(workoutListResponse.data));
+  // }, [workoutListResponse.data])
 
   const isLight = theme === "light";
   const textColor = isLight ? "text-black" : "text-white";
