@@ -91,7 +91,7 @@ export const useRegisterAttempt = () => {
 
     return useMutation({
         mutationFn:sendRegisterRequest,
-        onSuccess: (data, variables) => {
+        onSuccess: (_, variables) => {
             queryClient.invalidateQueries({queryKey: ["authUser"]})
             
             // Log in to created account upon success

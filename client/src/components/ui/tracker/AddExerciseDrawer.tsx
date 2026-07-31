@@ -36,15 +36,19 @@ const AddExerciseDrawer = ({ visible, setVisible, addExercise }: Props) => {
         >
           {/* Modal.Header */}
           <View
-            className={`flex-row justify-between items-center p-4 border-b border-gray-200 dark:border-gray-700`}
+            className={`flex-row justify-between items-center px-5 py-4 border-b border-gray-200 dark:border-gray-700`}
           >
-            <Text className="text-xl font-bold text-black dark:text-white">
+            <Text className="text-2xl font-bold text-black dark:text-white">
               Add an exercise
             </Text>
 
             {/* Close Button Equivalent */}
-            <Pressable onPress={handleClose} className="p-1">
-              <Text className="text-gray-500 text-lg font-bold">✕</Text>
+            <Pressable
+              onPress={handleClose}
+              className="h-11 w-11 items-center justify-center rounded-full active:bg-gray-100 dark:active:bg-gray-700"
+              aria-label="Close exercise picker"
+            >
+              <Text className="text-gray-500 text-2xl font-bold">✕</Text>
             </Pressable>
           </View>
 
@@ -98,17 +102,6 @@ const AddExerciseDrawer = ({ visible, setVisible, addExercise }: Props) => {
             )}
           </View>
 
-          {/* Modal.Footer */}
-          <View
-            className={`p-4 border-t border-gray-200 dark:border-gray-700 flex-row justify-end`}
-          >
-            <Pressable
-              onPress={handleClose}
-              className="bg-gray-500 px-4 py-2 rounded-lg active:bg-gray-600"
-            >
-              <Text className="text-white font-semibold">Close</Text>
-            </Pressable>
-          </View>
         </View>
       </View>
     </Modal>

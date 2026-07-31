@@ -1,10 +1,11 @@
 import { LocalWorkoutExercise, LocalWorkoutSet } from "@/Data/LocalData";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useContext } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Card } from "../Card";
 import { Feather } from "@expo/vector-icons";
 import SetDisplay from "./SetDisplay";
 import { randomUUID } from "expo-crypto";
+import { ThemeContext } from "@/contexts/theme/ThemeContext";
 
 interface Props {
   workoutExercises: LocalWorkoutExercise[];
@@ -19,7 +20,8 @@ const ExerciseDisplay = ({
   ex,
   exIndex,
 }: Props) => {
- 
+  const { theme } = useContext(ThemeContext);
+
   // Helper methods
   const deleteEx = (): void => {
     if (!workoutExercises) return;
@@ -41,7 +43,7 @@ const ExerciseDisplay = ({
         weight: -1,
         reps: -1,
         type: 1, // Normal set by default 
-        id:randomUUID() // Unique IDs for sets - local only, for drag and drop purposesw TODO: remove if not necessary
+        id:randomUUID() // Unique IDs for sets - local only, for drag and drop purposes TODO: remove if not necessary
       };
 
       const newExercises = [...prev];
@@ -57,29 +59,36 @@ const ExerciseDisplay = ({
 
   return (
     <Card key={ex.id} className="w-full">
-      <Card.Body>
-        <Text className="text-lg font-bold text-black dark:text-white"> {ex.exerciseName} </Text>
-        
+      <Card.Body className="p-5">
+        <Text className="text-2xl font-bold text-black dark:text-white">
+          {ex.exerciseName}
+        </Text>
+        <Text className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          {ex.workoutSets?.length ?? 0}{" "}
+          {ex.workoutSets?.length === 1 ? "set" : "sets"}
+        </Text>
+
         {ex.workoutSets?.map((set, index) => (
           <SetDisplay key={set.id} workoutExercises={workoutExercises} setWorkoutExercises={setWorkoutExercises} exIndex={exIndex} set={set} setIndex={index}/>
         ))}
 
         {/* Exercise Buttons */}
-        <View className="flex flex-row items-center mt-4">
+        <View className="flex flex-row items-center gap-3 mt-5">
           {/* Add set to Exercise */}
-          <Pressable 
-          className="bg-gray-300 w-fit px-3 py-2 mx-auto rounded-lg self-center"
+          <Pressable
+          className="flex-1 flex-row items-center justify-center gap-2 h-14 rounded-xl bg-gray-200 dark:bg-gray-600 active:opacity-70"
           onPress={addSet}
           aria-label="Add set to session exercise">
-            <Text className="text-base font-bold text-black"> Add Set </Text>
+            <Feather name="plus" size={20} color={theme === "light" ? "#111827" : "#ffffff"} />
+            <Text className="text-base font-bold text-black dark:text-white"> Add Set </Text>
           </Pressable>
 
           {/* Delete exercise */}
-          <Pressable 
-          className="me-4 bg-red-500 p-2 rounded-lg self-center"
+          <Pressable
+          className="h-14 w-14 items-center justify-center rounded-xl bg-red-500 active:opacity-70"
           onPress={deleteEx}
           aria-label="Delete session exercise">
-            <Feather name="trash-2" color="white" size={20}/>
+            <Feather name="trash-2" color="white" size={22}/>
           </Pressable>
         </View>
 

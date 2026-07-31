@@ -26,7 +26,6 @@ const getElapsedDisplay = (diff: number): string => {
 
 const WorkoutTimer = ({ startTime }: Props) => {
   const [elapsed, setElapsed] = useState<number>(0);
-  const { theme } = useContext(ThemeContext);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -38,13 +37,11 @@ const WorkoutTimer = ({ startTime }: Props) => {
     };
   }, []);
 
-  const iconColor = theme === "light" ? "black" : "white";
-
   return (
-    <Card className="rounded-full m-0 w-[120px] self-center overflow-hidden border-0">
-      <Card.Body className="flex-1 flex-row items-center justify-center gap-2 m-0 px-4 py-2 bg-blue-500">
-        <Feather name="clock" size={16} color={iconColor} />
-        <Text className="text-[16px] text-black dark:text-white">
+    <Card className="rounded-full m-0 self-center overflow-hidden border-0">
+      <Card.Body className="flex-row items-center justify-center gap-2 m-0 px-6 py-3 bg-blue-500">
+        <Feather name="clock" size={20} color="white" />
+        <Text className="text-lg font-semibold text-white">
           {getElapsedDisplay(elapsed)}
         </Text>
       </Card.Body>
