@@ -6,6 +6,8 @@ bin/
 obj/
 TestResults/
 publish/
+publish.zip
+deploy.ps1
 
 # User-specific configuration files
 *.user

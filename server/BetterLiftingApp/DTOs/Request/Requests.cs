@@ -27,7 +27,7 @@ namespace BetterLiftingApp.DTOs.Request
     public class WOSetRequest
     {
         public int Order {get; set;}
-        public int Weight { get; set; }
+        public decimal Weight { get; set; }
         public int Reps {get; set;}
         public int Type {get; set;}
         public int? RIR {get; set;}
