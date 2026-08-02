@@ -46,6 +46,13 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+// Apply any pending EF migrations on startupc
+using (var scope = app.Services.CreateScope())
+{
+    LiftingContext db = scope.ServiceProvider.GetRequiredService<LiftingContext>();
+    db.Database.Migrate();
+}
+
 app.MapGroup("/api/auth").MapIdentityApi<IdentityUser>(); // Adds identity endpoints
 
 // Add logout endpoint
