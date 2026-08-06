@@ -46,13 +46,6 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// Apply any pending EF migrations on startupc
-using (var scope = app.Services.CreateScope())
-{
-    LiftingContext db = scope.ServiceProvider.GetRequiredService<LiftingContext>();
-    db.Database.Migrate();
-}
-
 app.MapGroup("/api/auth").MapIdentityApi<IdentityUser>(); // Adds identity endpoints
 
 // Add logout endpoint
@@ -61,6 +54,11 @@ app.MapPost("/api/auth/logout", async (SignInManager<IdentityUser> signInManager
     await signInManager.SignOutAsync();
     return Results.Ok();
 }).RequireAuthorization();
+
+// Health check so the front end can check if the server is awake
+app.MapGet("/api/health", () => Results.Ok(new { status = "ok" }))
+   .AllowAnonymous()
+   .RequireCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
