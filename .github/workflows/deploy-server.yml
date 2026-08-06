@@ -9,8 +9,11 @@ on:
   workflow_dispatch: # for deploying from sidebar
 
 env:
-  AZURE_WEBAPP_NAME: mesopal-server       
+  AZURE_WEBAPP_NAME: mesopal-server
   PROJECT_PATH: server/BetterLiftingApp/BetterLiftingApp.csproj
+  AZURE_RESOURCE_GROUP: MesopalResources
+  AZURE_SQL_SERVER: mesopal
+  EF_TOOLS_VERSION: '10.0.9' 
 
 jobs:
   build-and-deploy:
@@ -29,13 +32,44 @@ jobs:
       - name: Build
         run: dotnet build ${{ env.PROJECT_PATH }} --configuration Release --no-restore
 
-      # Uncomment once a test project exists - this is what turns "CD" into "CI/CD",
-      # because a failing test then blocks the deploy.
-      # - name: Test
-      #   run: dotnet test --configuration Release --no-build
-
       - name: Publish
         run: dotnet publish ${{ env.PROJECT_PATH }} --configuration Release --output ./publish
+
+      - name: Install EF Core tools
+        run: |
+          dotnet tool install --global dotnet-ef --version ${{ env.EF_TOOLS_VERSION }}
+          echo "$HOME/.dotnet/tools" >> "$GITHUB_PATH"
+
+      - name: Azure login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Open SQL firewall for this runner
+        id: sql_firewall
+        run: |
+          RUNNER_IP=$(curl -fsS https://api.ipify.org)
+          echo "Runner IP: $RUNNER_IP"
+          az sql server firewall-rule create \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --server "$AZURE_SQL_SERVER" \
+            --name "gh-actions-${{ github.run_id }}" \
+            --start-ip-address "$RUNNER_IP" \
+            --end-ip-address "$RUNNER_IP"
+
+      - name: Apply EF Core migrations
+        env:
+          ConnectionStrings__DbConnection: ${{ secrets.AZURE_SQL_CONNECTION_STRING }}
+        run: dotnet ef database update --project ${{ env.PROJECT_PATH }} --configuration Release
+
+      - name: Close SQL firewall
+        if: always() && steps.sql_firewall.outcome == 'success'
+        run: |
+          az sql server firewall-rule delete \
+            --resource-group "$AZURE_RESOURCE_GROUP" \
+            --server "$AZURE_SQL_SERVER" \
+            --name "gh-actions-${{ github.run_id }}"
+      # -------------------------------------------------------------------------
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3

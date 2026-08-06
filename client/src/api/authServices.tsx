@@ -61,8 +61,8 @@ export const useLoginAttempt = () => {
 
     return useMutation({
         mutationFn: sendLoginRequest,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ["authUser"] });
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["authUser"] });
             router.replace("/");
         },
         onError: (err) => {
@@ -91,8 +91,8 @@ export const useRegisterAttempt = () => {
 
     return useMutation({
         mutationFn:sendRegisterRequest,
-        onSuccess: (_, variables) => {
-            queryClient.invalidateQueries({queryKey: ["authUser"]})
+        onSuccess: async (_, variables) => {
+            await queryClient.invalidateQueries({queryKey: ["authUser"]})
             
             // Log in to created account upon success
             const {mutate:triggerLogin} = useLoginAttempt();

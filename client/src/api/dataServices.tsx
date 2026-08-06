@@ -4,6 +4,7 @@ import type { ExResponse, MuscleResponse, WOResponse } from "../Data/Responses";
 import { checkLoggedIn, getLoginToken } from "./authServices";
 import { Platform } from "react-native";
 import { router } from "expo-router";
+import axios from 'axios';
 
 const rootURL = `${process.env.EXPO_PUBLIC_API_BASE_URL}`;
 const isWeb = Platform.OS === "web";
@@ -13,6 +14,36 @@ const isWeb = Platform.OS === "web";
 Fetch Methods
 -----------------------------------------------------------------------
 */
+
+type HealthStatus = "serverError" | "sleeping" | "awake"
+
+// Quick query with timeout to see if server is sleeping
+export const useCheckServerStatus = () => useQuery({
+  queryKey: ['serverAwake'],
+  queryFn: async (): Promise<HealthStatus> => {
+    try {
+      await axios.get(`${rootURL}/health`, {
+        timeout: 3000 // 3 second timeout to determine if server is awake.
+      });
+      return "awake";
+    } catch (error) {
+      if (axios.isAxiosError(error) && !error.response)  // Timeout
+        return "sleeping";
+      
+      // Error but not from timeout
+      return "serverError";
+    }
+  },
+  staleTime: (query) =>
+    query.state.data === "awake"
+    ? 20 * 60 * 1000 // 20 minute staleness if awake
+    : 10 * 1000, // 10 second staleness if sleeping
+  retry: 0,
+
+  // If server is asleep, keep polling every 2 seconds.
+  // If awake, don't re-poll.
+  refetchInterval: (query) => query.state.data === "sleeping" ? 2000 : false,
+});
 
 export const useFetchExercises = () => useQuery({
   queryKey: ["fetchExercises"],
