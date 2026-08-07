@@ -10,7 +10,17 @@ builder.Services.AddOpenApi();
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<LiftingContext>(
-    options => options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection"))
+    options => options.UseSqlServer(connectionString: builder.Configuration.GetConnectionString("DbConnection"), sqlOptions =>
+        {
+            // Time out and retry since SQL DB will sleep when inactive
+            sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 3,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                errorNumbersToAdd: null
+            );
+            sqlOptions.CommandTimeout(30);
+        }
+    )
 ); // DB Context for Data
 
 builder.Services.AddAuthorization();
@@ -72,3 +82,4 @@ app.UseCors("AllowFrontend");
 app.UseAuthorization();
 app.MapControllers();
 app.Run();
+
